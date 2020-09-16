@@ -71,24 +71,21 @@ contract EsusuAdapter{
     struct EsusuCycle{
         uint CycleId;
         uint DepositAmount;
-        mapping(address=>Member) Members;
+        uint TotalMembers;
         address Owner;
         uint PayoutInterval;    //  Time each member receives overall ROI within one Esusu Cycle
         TimeUnitEnum PayoutTimeIntervalUnit;  //  
         uint CycleDuration; //  The total time it will take for all users to be paid which is (number of members * payout interval)
-        mapping(address=> Member) Beneficiary;  // Members that have received overall ROI within one Esusu Cycle
         CurrencyEnum Currency;  //  Currency supported in this Esusu Cycle 
-        string ProtocolKey;
         string CurrencySymbol;
         CycleStateEnum CycleState;  //  The current state of the Esusu Cycle
-        uint DepositWindow; //  Time each cycle will be in the Idle State for people to be able to make their deposits
-        TimeUnitEnum DepositWindowUnit;    
         uint256 TotalAmountDeposited;
     }
     
     struct Member{
         address MemberId;
-        uint Balance;
+        uint TotalDeposited;
+        uint TotalPayoutReceived;
     }
     
     struct MemberCycle{
@@ -113,17 +110,19 @@ contract EsusuAdapter{
 
     mapping(address=>mapping(uint=>MemberCycle)) MemberAddressToMemberCycleMapping;
 
-    function CreateEsusu(uint depositAmount, uint payoutTimeIntervalUnit, uint payoutInterval, uint currency, uint depositWindow, uint depositWindowUnit ) external {
+    mapping(uint=>mapping(address=>uint)) CycleToMemberPositionMapping;   //  This tracks position of the  member in an Esusu Cycle
+
+    mapping(uint=>mapping(address=> Member)) CycleToBeneficiaryMapping;  // This tracks members that have received overall ROI within an Esusu Cycle
+
+    function CreateEsusu(uint depositAmount, uint payoutTimeIntervalUnit, uint payoutInterval) external {
         
         EsusuCycle memory cycle;
         cycle.DepositAmount = depositAmount;
         cycle.PayoutTimeIntervalUnit = TimeUnitEnum(payoutTimeIntervalUnit);
         cycle.PayoutInterval = payoutInterval;
-        cycle.Currency = CurrencyEnum(currency);
+        cycle.Currency = CurrencyEnum.Dai;
         cycle.CurrencySymbol = Dai;
         cycle.CycleState = CycleStateEnum.Idle; 
-        cycle.DepositWindow = depositWindow;
-        cycle.DepositWindowUnit = TimeUnitEnum(depositWindowUnit);
         cycle.Owner = msg.sender;
         
         //  Increment EsusuCycleId by 1
@@ -141,13 +140,13 @@ contract EsusuAdapter{
     
     //  Join a particular Esusu Cycle 
     /*
-        1. Check if the cycle ID is valid
-        2. Check if the cycle is in Idle state, that is the only state a member can join
-        3. Check if we are within the deposit window
-        4. Check if member is already in Cycle
-        4. Ensure member has approved this contract to transfer the token on his/her behalf
-        5. If member has enough balance, transfer the tokens to this contract else bounce
-        6. Increment the total deposited amount in this cycle and total deposited amount for the member cycle struct 
+        - Check if the cycle ID is valid
+        - Check if the cycle is in Idle state, that is the only state a member can join
+        - Check if member is already in Cycle
+        - Ensure member has approved this contract to transfer the token on his/her behalf
+        - If member has enough balance, transfer the tokens to this contract else bounce
+        - Increment the total deposited amount in this cycle and total deposited amount for the member cycle struct 
+        - Increment the total number of Members that have joined this cycle 
     */
     function JoinEsusu(uint esusuCycleId, address member)external {
         
@@ -158,8 +157,9 @@ contract EsusuAdapter{
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         require(cycle.CycleState == CycleStateEnum.Idle, "Esusu Cycle must be in Idle State before you can join");
         
-        //  TODO: check if we are within deposit window
-        //  TODO: check if member is already in this cycle 
+
+        //  check if member is already in this cycle 
+        require(_isMemberInCycle(member,esusuCycleId) == false, "Member can't join same Esusu Cycle more than once");
         
         //  If user does not have enough Balance, bounce. For now we use Dai as default
         uint memberBalance = dai.balanceOf(member);
@@ -176,39 +176,70 @@ contract EsusuAdapter{
         //  Increment the total deposited amount for the member cycle struct
         mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[member];
         
-        // uint CycleId;
-        // address MemberId;
-        // uint TotalAmountDepositedInCycle;
-        // uint TotalPayoutReceivedInCycle;
+
         memberCycleMapping[esusuCycleId].CycleId = esusuCycleId;
         memberCycleMapping[esusuCycleId].MemberId = member;
         memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle = memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle.add(cycle.DepositAmount);
         memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle = memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle.add(0);
         
+        //  Increase TotalMembers count by 1
+        EsusuCycleMapping[esusuCycleId].TotalMembers = EsusuCycleMapping[esusuCycleId].TotalMembers.add(1);
         
+        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[esusuCycleId];
+        
+        //  Assign Position to Member In this Cycle
+        memberPositionMapping[member] = EsusuCycleMapping[esusuCycleId].TotalMembers;
     }
     
-    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) external view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, uint TotalPayoutReceivedInCycle){
+    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) external view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, uint TotalPayoutReceivedInCycle, uint memberPosition){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
         mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[memberAddress];
         
-        return(memberCycleMapping[esusuCycleId].CycleId,memberCycleMapping[esusuCycleId].MemberId,memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle,memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle);
+        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[esusuCycleId];
+        
+        //  Get Number(Position) of Member In this Cycle
+        uint memberPos = memberPositionMapping[memberAddress];
+        
+        return  (memberCycleMapping[esusuCycleId].CycleId,memberCycleMapping[esusuCycleId].MemberId,
+        memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle,
+        memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle,memberPos);
     }
 
     function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
                                                             uint PayoutTimeIntervalUnit, uint PayoutInterval, uint Currency, 
-                                                            string memory CurrencySymbol, uint CycleState, uint DepositWindow, uint  DepositWindowUnit, address Onwer ){
+                                                            string memory CurrencySymbol, uint CycleState, address Owner, uint TotalMembers ){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         
-        return (cycle.CycleId, cycle.DepositAmount, uint256(cycle.PayoutTimeIntervalUnit),  cycle.PayoutInterval, uint256(cycle.Currency),cycle.CurrencySymbol,uint256(cycle.CycleState), cycle.DepositWindow,uint256(cycle.DepositWindowUnit), cycle.Owner  );
+        return (cycle.CycleId, cycle.DepositAmount, uint256(cycle.PayoutTimeIntervalUnit),  cycle.PayoutInterval, 
+                uint256(cycle.Currency),cycle.CurrencySymbol,uint256(cycle.CycleState), cycle.Owner,cycle.TotalMembers);
         
     }
     
+    /*
+        - Check if the Id is a valid ID
+        - Check if the cycle is in Idle State
+        - Only owner of a cycle can start that cycle - TODO: Change this function to public so it can be called from another contract
+    */
+    function StartEsusuCycle(uint esusuCycleId, address owner) external {
+        
+        //  If cycle ID is valid, else bonunce
+        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
+        
+        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+        
+        require(cycle.CycleState == CycleStateEnum.Idle, "Cycle can only be started when in Idle state");
+        
+        require(cycle.Owner == owner, "Only owner of this Esusu Can start this cycle");
+        
+        EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum.Active;
+        
+        //
+    }
     
     function GetBalance(address member) external view returns(uint){
         return dai.balanceOf(member);
@@ -218,5 +249,17 @@ contract EsusuAdapter{
         return EsusuCycleId;
     }
     
+    function _isMemberInCycle(address memberAddress,uint esusuCycleId ) internal view returns(bool){
+        
+        mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[memberAddress];
+        
+        //  If member is in cycle, the cycle ID should be greater than 0
+        if(memberCycleMapping[esusuCycleId].CycleId > 0){
+            
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
 
