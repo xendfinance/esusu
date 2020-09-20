@@ -5,8 +5,10 @@ import "./IYDaiToken.sol";
 
 import "./IDaiLendingService.sol";
 
+
 // TODO: change all these external functions to public once we create the Esusu Service contract that call this
 // TODO: add a function that only owner of this contract can call to transfer the left over dai for every inactive cycle if any to the community wallet
+// TODO: change milliseconds to seconds . Probably just do find and replace
 
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -108,7 +110,8 @@ contract EsusuAdapter{
     /* Model definition ends */
     
     address _owner;
-    address _daiLendingServiceContractAddress;
+    IDaiLendingService _iDaiLendingService;
+    
     constructor () public{
         _owner = msg.sender;
     }
@@ -117,7 +120,7 @@ contract EsusuAdapter{
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
 
-    IDaiLendingService _iDaiLendingService = IDaiLendingService(_daiLendingServiceContractAddress);
+     
 
     uint EsusuCycleId = 0;
     
@@ -135,7 +138,7 @@ contract EsusuAdapter{
     mapping(uint=>mapping(address=> uint)) CycleToMemberWithdrawnCapitalMapping;    // Rhis tracks members that have withdrawn their capital and the amount withdrawn 
     
     function UpdateDaiLendingService(address daiLendingServiceContractAddress) external onlyOwner(){
-        _daiLendingServiceContractAddress = daiLendingServiceContractAddress;
+        _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
     }
     
     
@@ -174,11 +177,11 @@ contract EsusuAdapter{
     */
     function JoinEsusu(uint esusuCycleId, address member)external {
         
-        //  If cycle ID is 0, bonunce
+        //  Check if the cycle ID is valid
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
 
         //  If cycle is not in Idle State, bounce 
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+        EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
         require(cycle.CycleState == CycleStateEnum.Idle, "Esusu Cycle must be in Idle State before you can join");
         
 
@@ -232,15 +235,20 @@ contract EsusuAdapter{
     }
 
     function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
-                                                            uint PayoutIntervalMilliSeconds, uint Currency, 
-                                                            string memory CurrencySymbol, uint CycleState, address Owner, uint TotalMembers ){
+                                                            uint PayoutIntervalMilliSeconds, uint CycleState, address Owner, 
+                                                            uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
+                                                            uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
+                                                            uint TotalBeneficiaries){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         
         return (cycle.CycleId, cycle.DepositAmount,  cycle.PayoutIntervalMilliSeconds, 
-                uint256(cycle.Currency),cycle.CurrencySymbol,uint256(cycle.CycleState), cycle.Owner,cycle.TotalMembers);
+                uint256(cycle.CycleState),
+                cycle.Owner,cycle.TotalMembers, cycle.TotalAmountDeposited, cycle.TotalShares,
+                cycle.TotalCycleDuration, cycle.TotalCapitalWithdrawn, cycle.CycleStartTime,
+                cycle.TotalBeneficiaries);
         
     }
     
@@ -260,7 +268,7 @@ contract EsusuAdapter{
         //  If cycle ID is valid, else bonunce
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+        EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
         
         require(cycle.CycleState == CycleStateEnum.Idle, "Cycle can only be started when in Idle state");
         
@@ -274,8 +282,8 @@ contract EsusuAdapter{
         //  Set the Cycle start time 
         EsusuCycleMapping[esusuCycleId].CycleStartTime = now;
         
-        //  Get all the dai from this contract : TODO we might change the storage of dai deposits to another address or contract
-        uint esusuCycleBalance = _dai.balanceOf(address(this));
+        //  Get all the dai deposited for this cycle
+        uint esusuCycleBalance = cycle.TotalAmountDeposited;
         
         //  Get the balance of yDaiSharesForContract before save opration
         uint yDaiSharesForContractBeforeSave = _yDai.balanceOf(address(this));
@@ -283,6 +291,11 @@ contract EsusuAdapter{
         //  Invest the dai in Yearn Finance using Dai Lending Service.
         
         //  NOTE: yDai will be sent to this contract
+        //  Transfer dai from this contract to dai lending adapter and then call a new save function that will not use transferFrom internally
+        //  Approve the daiLendingAdapter so it can spend our Dai on our behalf 
+        address daiLendingAdapterContractAddress = _iDaiLendingService.GetDaiLendingAdapterAddress();
+        _dai.approve(daiLendingAdapterContractAddress,esusuCycleBalance);
+        
         _iDaiLendingService.save(esusuCycleBalance);
         
         //  Get the balance of yDaiSharesForContract after save operation
@@ -346,7 +359,7 @@ contract EsusuAdapter{
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
         uint Bt = cycle.PayoutIntervalMilliSeconds.mul(cycle.TotalBeneficiaries);
         uint Ta = now.sub(Bt);
-        uint Troi = overallGrossDaiBalance - cycle.TotalAmountDeposited;
+        uint Troi = overallGrossDaiBalance.sub(cycle.TotalAmountDeposited);
         uint Mroi = Troi.div(Ta);
         
         
@@ -361,8 +374,13 @@ contract EsusuAdapter{
         //  Get the yDaiSharesForContractBeforeWithdrawal 
         uint yDaiSharesForContractBeforeWithdrawal = _yDai.balanceOf(address(this));
         
-        //  Withdraw the Dai. At this point, we have withdrawn all the Dai for this cycle and we will now transfer
+        //  Withdraw the Dai. At this point, we have withdrawn the Dai ROI for this member and the dai ROI is in this contract, we will now transfer it to the member
+        address daiLendingAdapterContractAddress = _iDaiLendingService.GetDaiLendingAdapterAddress();
+        _yDai.approve(daiLendingAdapterContractAddress,yDaiSharesPerCycle);
         _iDaiLendingService.WithdrawByShares(Mroi,yDaiSharesPerCycle);
+        
+        //  Now the Dai is in this contract, transfer it to the member 
+        _dai.transfer(member, Mroi);
         
         //  Get the yDaiSharesForContractAfterWithdrawal 
         uint yDaiSharesForContractAfterWithdrawal = _yDai.balanceOf(address(this));
@@ -425,8 +443,13 @@ contract EsusuAdapter{
         //  Get the yDaiSharesForContractBeforeWithdrawal 
         uint yDaiSharesForContractBeforeWithdrawal = _yDai.balanceOf(address(this));
         
-        //  Withdraw the Dai. At this point, we have withdrawn all the Dai for this cycle and we will now transfer
+        //  Withdraw the Dai. At this point, we have withdrawn  Dai Capital deposited by this member for this cycle and we will now transfer the dai capital to the member
+        address daiLendingAdapterContractAddress = _iDaiLendingService.GetDaiLendingAdapterAddress();
+        _yDai.approve(daiLendingAdapterContractAddress,yDaiSharesPerCycle);
         _iDaiLendingService.WithdrawByShares(memberDeposit,yDaiSharesPerCycle);
+        
+        //  Now the Dai is in this contract, transfer it to the member 
+        _dai.transfer(member, memberDeposit);
         
         //  Get the yDaiSharesForContractAfterWithdrawal 
         uint yDaiSharesForContractAfterWithdrawal = _yDai.balanceOf(address(this));
@@ -518,10 +541,44 @@ contract EsusuAdapter{
         
     }
     
-    function GetBalance(address member) external view returns(uint){
+    // function ApproveDaiLendingAdapter(address daiLendingAdapterContractAddress, uint amount) external {
+    //     address(this).approve(daiLendingAdapterContractAddress,amount);
+    // }
+    /* Test helper functions starts  TODO: remove later */
+    function GetDaiBalance(address member) external view returns(uint){
         return _dai.balanceOf(member);
     }
     
+    function GetYDaiBalance(address member) external view returns(uint){
+        return _yDai.balanceOf(member);
+    }
+    
+    function GetCurrentTime() external view returns (uint){
+        return now;
+    }
+    function GetTimeInMinutes() external view returns (uint){
+        return 5 minutes;
+    }
+    function GetTimeInMinutesPlusnow() external view returns (uint){
+        return 5 minutes + now;
+    }
+    
+    function CalculateMemberWithdrawalTime(uint esusuCycleId, address member) internal view returns(uint){
+        
+        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+
+        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[cycle.CycleId];
+        
+        uint memberPosition = memberPositionMapping[member];
+        
+        uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalMilliSeconds)));
+        
+        return withdrawalTime;
+    }
+    
+    
+    /* Test helper functions ends */
+
     /*
         This function returns the Withdrawal time for a member in milliseconds
         
