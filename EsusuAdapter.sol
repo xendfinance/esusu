@@ -359,7 +359,7 @@ contract EsusuAdapter{
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
         uint Bt = cycle.PayoutIntervalMilliSeconds.mul(cycle.TotalBeneficiaries);
         uint Ta = now.sub(Bt);
-        uint Troi = overallGrossDaiBalance.sub(cycle.TotalAmountDeposited);
+        uint Troi = overallGrossDaiBalance.sub(cycle.TotalAmountDeposited.sub(cycle.TotalCapitalWithdrawn));
         uint Mroi = Troi.div(Ta);
         
         
