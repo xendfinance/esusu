@@ -20,4 +20,6 @@ interface IDaiLendingService {
     function WithdrawByShares(uint amount, uint sharesAmount) external;
     
     function GetDaiLendingAdapterAddress() external view returns (address);
+    
+    function WithdrawBySharesOnly(uint sharesAmount) external;
 }

@@ -8,7 +8,6 @@ import "./IDaiLendingService.sol";
 
 // TODO: change all these external functions to public once we create the Esusu Service contract that call this
 // TODO: add a function that only owner of this contract can call to transfer the left over dai for every inactive cycle if any to the community wallet
-// TODO: change milliseconds to seconds . Probably just do find and replace
 
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -82,7 +81,7 @@ contract EsusuAdapter{
         uint TotalMembers;
         uint TotalBeneficiaries;
         address Owner;
-        uint PayoutIntervalMilliSeconds;    //  Time each member receives overall ROI within one Esusu Cycle in milliseconds
+        uint PayoutIntervalSeconds;    //  Time each member receives overall ROI within one Esusu Cycle in seconds
         uint CycleDuration; //  The total time it will take for all users to be paid which is (number of members * payout interval)
         CurrencyEnum Currency;  //  Currency supported in this Esusu Cycle 
         string CurrencySymbol;
@@ -109,14 +108,14 @@ contract EsusuAdapter{
     
     /* Model definition ends */
     
-    address _owner;
-    IDaiLendingService _iDaiLendingService;
-    
     constructor () public{
         _owner = msg.sender;
     }
-    //  Member variables
     
+    
+    //  Member variables
+    address _owner;
+    IDaiLendingService _iDaiLendingService;
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
 
@@ -142,19 +141,19 @@ contract EsusuAdapter{
     }
     
     
-    function CreateEsusu(uint depositAmount, uint payoutIntervalMilliSeconds) external {
+    function CreateEsusu(uint depositAmount, uint payoutIntervalSeconds, address owner) public {
         
         EsusuCycle memory cycle;
         cycle.DepositAmount = depositAmount;
-        cycle.PayoutIntervalMilliSeconds = payoutIntervalMilliSeconds;
+        cycle.PayoutIntervalSeconds = payoutIntervalSeconds;
         cycle.Currency = CurrencyEnum.Dai;
         cycle.CurrencySymbol = Dai;
         cycle.CycleState = CycleStateEnum.Idle; 
-        cycle.Owner = msg.sender;
+        cycle.Owner = owner;
         
         //  Increment EsusuCycleId by 1
         EsusuCycleId += 1;
-        cycle.CycleId = EsusuCycleId;
+        EsusuCycleMapping[EsusuCycleId].CycleId = EsusuCycleId;
 
         //  Create mapping
         EsusuCycleMapping[EsusuCycleId] = cycle;
@@ -175,7 +174,7 @@ contract EsusuAdapter{
         - Increment the total deposited amount in this cycle and total deposited amount for the member cycle struct 
         - Increment the total number of Members that have joined this cycle 
     */
-    function JoinEsusu(uint esusuCycleId, address member)external {
+    function JoinEsusu(uint esusuCycleId, address member) public {
         
         //  Check if the cycle ID is valid
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
@@ -218,7 +217,7 @@ contract EsusuAdapter{
         memberPositionMapping[member] = EsusuCycleMapping[esusuCycleId].TotalMembers;
     }
     
-    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) external view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, uint TotalPayoutReceivedInCycle, uint memberPosition){
+    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) public view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, uint TotalPayoutReceivedInCycle, uint memberPosition){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
@@ -234,8 +233,8 @@ contract EsusuAdapter{
         memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle,memberPos);
     }
 
-    function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
-                                                            uint PayoutIntervalMilliSeconds, uint CycleState, address Owner, 
+    function GetEsusuCycle(uint esusuCycleId) public view returns(uint CycleId, uint DepositAmount, 
+                                                            uint PayoutIntervalSeconds, uint CycleState, address Owner, 
                                                             uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
                                                             uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
                                                             uint TotalBeneficiaries){
@@ -244,7 +243,7 @@ contract EsusuAdapter{
         
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         
-        return (cycle.CycleId, cycle.DepositAmount,  cycle.PayoutIntervalMilliSeconds, 
+        return (cycle.CycleId, cycle.DepositAmount,  cycle.PayoutIntervalSeconds, 
                 uint256(cycle.CycleState),
                 cycle.Owner,cycle.TotalMembers, cycle.TotalAmountDeposited, cycle.TotalShares,
                 cycle.TotalCycleDuration, cycle.TotalCapitalWithdrawn, cycle.CycleStartTime,
@@ -256,14 +255,14 @@ contract EsusuAdapter{
         - Check if the Id is a valid ID
         - Check if the cycle is in Idle State
         - Only owner of a cycle can start that cycle - TODO: Change this function to public so it can be called from another contract
-        - Get the total number of members and then mulitply by the time interval in milliseconds to get the total time this Cycle will last for
+        - Get the total number of members and then mulitply by the time interval in seconds to get the total time this Cycle will last for
         - Set the Cycle start time to now 
         - Take everyones deposited DAI from this Esusu Cycle and then invest through Yearn 
         - Track the yDai shares that belong to this cycle using the derived equation below for save/investment operation
             - yDaiSharesPerCycle = Change in yDaiSharesForContract + Current yDai Shares in the cycle 
             - Change in yDaiSharesForContract = yDai.balanceOf(address(this) after save operation - yDai.balanceOf(address(this) after before operation
     */
-    function StartEsusuCycle(uint esusuCycleId, address owner) external {
+    function StartEsusuCycle(uint esusuCycleId, address owner) public {
         
         //  If cycle ID is valid, else bonunce
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
@@ -276,8 +275,8 @@ contract EsusuAdapter{
         
         EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum.Active;
         
-        //  Calculate Cycle LifeTime in milliseconds
-        EsusuCycleMapping[esusuCycleId].TotalCycleDuration = cycle.PayoutIntervalMilliSeconds * cycle.TotalMembers;
+        //  Calculate Cycle LifeTime in seconds
+        EsusuCycleMapping[esusuCycleId].TotalCycleDuration = cycle.PayoutIntervalSeconds * cycle.TotalMembers;
         
         //  Set the Cycle start time 
         EsusuCycleMapping[esusuCycleId].CycleStartTime = now;
@@ -320,10 +319,10 @@ contract EsusuAdapter{
         - Get ROI => overall Dai - Total Deposited Dai in this esusu cycle 
         - Implement our derived equation to determine what ROI will be allocated to this member who is withdrawing 
         - Equation Parameters
-            - Ta => Total available time in milliseconds
-            - Bt => Total Time Interval for beneficiaries in this cycle in milliseconds
-            - Tnow => Current Time in milliseconds
-            - T => Cycle PayoutIntervalMilliSeconds
+            - Ta => Total available time in seconds
+            - Bt => Total Time Interval for beneficiaries in this cycle in seconds
+            - Tnow => Current Time in seconds
+            - T => Cycle PayoutIntervalSeconds
             - Troi => Total accumulated ROI
             - Mroi => Member ROI 
             
@@ -341,7 +340,7 @@ contract EsusuAdapter{
             - Change in yDaiSharesForContract = yDai.balanceOf(address(this)) before withdraw operation - yDai.balanceOf(address(this)) after withdraw operation
         
     */
-    function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member) external {
+    function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member) public {
         
         bool isMemberEligibleToWithdraw = _isMemberEligibleToWithdrawROI(esusuCycleId,member);
         
@@ -357,7 +356,7 @@ contract EsusuAdapter{
         
         
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
-        uint Bt = cycle.PayoutIntervalMilliSeconds.mul(cycle.TotalBeneficiaries);
+        uint Bt = cycle.PayoutIntervalSeconds.mul(cycle.TotalBeneficiaries);
         uint Ta = now.sub(Bt);
         uint Troi = overallGrossDaiBalance.sub(cycle.TotalAmountDeposited.sub(cycle.TotalCapitalWithdrawn));
         uint Mroi = Troi.div(Ta);
@@ -396,9 +395,7 @@ contract EsusuAdapter{
         /*
                 
             - Check whether the TotalCycleDuration has elapsed, if that is the case then this cycle has expired
-                
-            Since this is the last person and we have sent the remaining yDai balanceShares to our calling contract, we now own the shares and we will share it with
-            our community
+
         */
         
         if(now > cycle.TotalCycleDuration){
@@ -425,7 +422,7 @@ contract EsusuAdapter{
 
     */
     
-    function WithdrawCapitalFromEsusuCycle(uint esusuCycleId, address member) external {
+    function WithdrawCapitalFromEsusuCycle(uint esusuCycleId, address member) public {
         
         require(_isMemberEligibleToWithdrawCapital(esusuCycleId,member));
         
@@ -483,7 +480,7 @@ contract EsusuAdapter{
         - Calculate member withdrawal time
         - Check if member can withdraw at this time
     */
-    function IsMemberEligibleToWithdrawROI(uint esusuCycleId, address member) external view returns(bool){
+    function IsMemberEligibleToWithdrawROI(uint esusuCycleId, address member) public view returns(bool){
         
         return _isMemberEligibleToWithdrawROI(esusuCycleId,member);
         
@@ -494,7 +491,7 @@ contract EsusuAdapter{
         
         The cycle must be in an inactive state before capital can be withdrawn
     */
-    function IsMemberEligibleToWithdrawCapital(uint esusuCycleId, address member) external view returns(bool){
+    function IsMemberEligibleToWithdrawCapital(uint esusuCycleId, address member) public view returns(bool){
         
         return _isMemberEligibleToWithdrawCapital(esusuCycleId,member);
         
@@ -541,9 +538,6 @@ contract EsusuAdapter{
         
     }
     
-    // function ApproveDaiLendingAdapter(address daiLendingAdapterContractAddress, uint amount) external {
-    //     address(this).approve(daiLendingAdapterContractAddress,amount);
-    // }
     /* Test helper functions starts  TODO: remove later */
     function GetDaiBalance(address member) external view returns(uint){
         return _dai.balanceOf(member);
@@ -571,22 +565,22 @@ contract EsusuAdapter{
         
         uint memberPosition = memberPositionMapping[member];
         
-        uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalMilliSeconds)));
+        uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalSeconds)));
         
         return withdrawalTime;
     }
     
     
-    /* Test helper functions ends */
+    /*  Test helper functions ends TODO: remove later */
 
     /*
-        This function returns the Withdrawal time for a member in milliseconds
+        This function returns the Withdrawal time for a member in seconds
         
         Parameters
         - Wt    -> Withdrawal Time for a member 
         - To    -> Cycle Start Time
         - Mpos  -> Member Position in the Cycle 
-        - Ct     -> Cycle Time Interval in milliseconds
+        - Ct     -> Cycle Time Interval in seconds
         
         Equation
         Wt = (To + (Mpos * Ct))
@@ -598,12 +592,12 @@ contract EsusuAdapter{
         
         uint memberPosition = memberPositionMapping[member];
         
-        uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalMilliSeconds)));
+        uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalSeconds)));
         
         return withdrawalTime;
     }
     
-    function GetCurrentEsusuCycleId() external view returns(uint){
+    function GetCurrentEsusuCycleId() public view returns(uint){
         return EsusuCycleId;
     }
     
