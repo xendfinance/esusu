@@ -4,7 +4,7 @@ import "./EsusuAdapter.sol";
 
 
 
-contract DaiLendingService{
+contract EsusuService{
     
     address _owner;
     EsusuAdapter _esusuAdapter;
@@ -30,9 +30,9 @@ contract DaiLendingService{
     }
     
     
-    function CreateEsusu(uint depositAmount, uint payoutIntervalSeconds) external {
+    function CreateEsusu(uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds,uint maxMembers) external {
         
-        _esusuAdapter.CreateEsusu(depositAmount,payoutIntervalSeconds,msg.sender);
+        _esusuAdapter.CreateEsusu(depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
     }
     
     /*
