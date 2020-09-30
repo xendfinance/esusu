@@ -6,9 +6,9 @@ import "./IYDaiToken.sol";
 import "./IDaiLendingService.sol";
 import "./OwnableService.sol";
 import "./ITreasury.sol";
+import "./ISavingsConfig.sol";
+import "./ISavingsConfigSchema.sol";
 
-
-//  TODO: add a fee for each ROI withdrawal in DAI and get this fee from our Fee Contract 
 //  TODO: add reward contract to reward people when they deposit funds that will be locked for a certain period
 
 library SafeMath {
@@ -56,7 +56,7 @@ library SafeMath {
     }
 }
 
-contract EsusuAdapter is Ownable{
+contract EsusuAdapter is Ownable, ISavingsConfigSchema {
     
     
     /*
@@ -134,7 +134,6 @@ contract EsusuAdapter is Ownable{
         Inactive            // Total beneficiaries is equal to Total members, so all members have withdrawn their Capital and ROI 
     }
     
-    
     /*  Struct Definitions */
     struct EsusuCycle{
         uint CycleId;
@@ -169,20 +168,23 @@ contract EsusuAdapter is Ownable{
     
     /* Model definition ends */
     
-    constructor (address payable serviceContract, address payable treasuryContract) public Ownable(serviceContract){
+    constructor (address payable serviceContract, address payable treasuryContract, address savingsConfigContract, string memory feeRuleKey) public Ownable(serviceContract){
         _owner = msg.sender;
         _treasuryContract = ITreasury(treasuryContract);
+        _savingsConfigContract = ISavingsConfig(savingsConfigContract);
+        _feeRuleKey = feeRuleKey;
     }
     
     
     //  Member variables
     address _owner;
     ITreasury _treasuryContract;
+    ISavingsConfig _savingsConfigContract;
+
     IDaiLendingService _iDaiLendingService;
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
-
-     
+    string _feeRuleKey;
 
     uint EsusuCycleId = 0;
     
@@ -744,11 +746,30 @@ contract EsusuAdapter is Ownable{
         - Send the net ROI in dai to member 
         - Send the fee to the treasury
         - Add member to beneficiary mapping
+        
+            function getRuleSet(string calldata ruleKey)
+        external
+        returns (
+            uint256,
+            uint256,
+            uint256,
+            bool,
+            RuleDefinition
+        );
+        
+                    ruleSet.minimum,
+            ruleSet.maximum,
+            ruleSet.exact,
+            ruleSet.applies,
+            ruleSet.ruleDefinition
     */
     function sendROI(uint Mroi, address memberAddress, EsusuCycle memory cycle) internal{
-        //  TODO: get this from fee contract
-
-        uint feeRate = 1e3;    
+        
+        //  get feeRate from fee contract
+        (uint minimum, uint maximum, uint exact, bool applies, RuleDefinition e)  = _savingsConfigContract.getRuleSet(_feeRuleKey);
+        
+        
+        uint feeRate = exact;    
         uint fee = Mroi.div(feeRate);
         
         //  Deduct the fee
