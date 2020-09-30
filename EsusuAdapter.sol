@@ -4,10 +4,12 @@ import "./IDaiToken.sol";
 import "./IYDaiToken.sol";
 
 import "./IDaiLendingService.sol";
-import "./Ownable.sol";
+import "./OwnableService.sol";
+import "./ITreasury.sol";
 
-// TODO: add a function that only owner of this contract can call to transfer the left over dai for every inactive cycle if any to the community wallet
-// TODO: add a fee for each ROI withdrawal in DAI and get this fee from our Fee Contract 
+
+//  TODO: add a fee for each ROI withdrawal in DAI and get this fee from our Fee Contract 
+//  TODO: add reward contract to reward people when they deposit funds that will be locked for a certain period
 
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -167,13 +169,15 @@ contract EsusuAdapter is Ownable{
     
     /* Model definition ends */
     
-    constructor (address payable serviceContract) public Ownable(serviceContract){
+    constructor (address payable serviceContract, address payable treasuryContract) public Ownable(serviceContract){
         _owner = msg.sender;
+        _treasuryContract = ITreasury(treasuryContract);
     }
     
     
     //  Member variables
     address _owner;
+    ITreasury _treasuryContract;
     IDaiLendingService _iDaiLendingService;
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
@@ -193,6 +197,8 @@ contract EsusuAdapter is Ownable{
     mapping(uint=>mapping(address=> uint)) CycleToBeneficiaryMapping;  // This tracks members that have received overall ROI and amount received within an Esusu Cycle
     
     mapping(uint=>mapping(address=> uint)) CycleToMemberWithdrawnCapitalMapping;    // This tracks members that have withdrawn their capital and the amount withdrawn 
+    
+    uint TotalDeposits; //  This holds all the dai amounts users have deposited in this contract
     
     function UpdateDaiLendingService(address daiLendingServiceContractAddress) external onlyOwner(){
         _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
@@ -259,7 +265,7 @@ contract EsusuAdapter is Ownable{
         
         require(memberBalance >= cycle.DepositAmount, "Balance must be greater than or equal to Deposit Amount");
         
-        //  If user balance is greater than or equal to deposit amount then transfer from member to this contract TODO: we will send to storage contract later
+        //  If user balance is greater than or equal to deposit amount then transfer from member to this contract
         //  NOTE: approve this contract to withdraw before transferFrom can work
         _dai.transferFrom(member, address(this),cycle.DepositAmount);
         
@@ -325,7 +331,7 @@ contract EsusuAdapter is Ownable{
     /*
         - Check if the Id is a valid ID
         - Check if the cycle is in Idle State
-        - Only owner of a cycle can start that cycle - TODO: Change this function to public so it can be called from another contract
+        - Anyone  can start that cycle -
         - Get the total number of members and then mulitply by the time interval in seconds to get the total time this Cycle will last for
         - Set the Cycle start time to now 
         - Take everyones deposited DAI from this Esusu Cycle and then invest through Yearn 
@@ -376,6 +382,9 @@ contract EsusuAdapter is Ownable{
         
         //  Update the Cycle start time to now
         EsusuCycleMapping[esusuCycleId].CycleStartTime = now;
+        
+        //  Increase TotalDeposits made to this contract 
+        TotalDeposits = TotalDeposits.add(esusuCycleBalance);
         
         //  emit event 
         emit StartEsusuCycleEvent(now,cycle.Owner,esusuCycleBalance, EsusuCycleMapping[esusuCycleId].TotalCycleDuration,
@@ -546,7 +555,10 @@ contract EsusuAdapter is Ownable{
             EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum.Inactive;
             
             //  Since this cycle is inactive, send whatever Total shares is left to our treasury contract
-            //  TODO: send cycle.TotalShares to treasury
+            //  send cycle.TotalShares to treasury
+            //  Approve the treasury contract 
+            _yDai.approve(address(_treasuryContract),cycle.TotalShares);
+            _treasuryContract.depositToken(address(_yDai));
             
         }
         
@@ -646,6 +658,9 @@ contract EsusuAdapter is Ownable{
         return withdrawalTime;
     }
     
+    function GetTotalDeposits() onlyOwnerAndServiceContract public view returns(uint)  {
+        return TotalDeposits;
+    } 
     
     /*  Test helper functions ends TODO: remove later */
 
@@ -732,8 +747,7 @@ contract EsusuAdapter is Ownable{
     */
     function sendROI(uint Mroi, address memberAddress, EsusuCycle memory cycle) internal{
         //  TODO: get this from fee contract
-        //  TODO: get treasury contract addrress
-        
+
         uint feeRate = 1e3;    
         uint fee = Mroi.div(feeRate);
         
@@ -744,14 +758,16 @@ contract EsusuAdapter is Ownable{
         _dai.transfer(memberAddress, memberROINet);
         
         //  Send deducted fee to treasury
-        _dai.transfer(address(this), fee);  // TODO: hange this when treasury contracct is ready
-
+        //  Approve the treasury contract 
+        _dai.approve(address(_treasuryContract),fee);
+        _treasuryContract.depositToken(address(_dai));
+        
+        
         //  Add member to beneficiary mapping
         mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[cycle.CycleId];
         
         beneficiaryMapping[memberAddress] = memberROINet;
     }
     
-
 }
 

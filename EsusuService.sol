@@ -78,12 +78,16 @@ contract EsusuService{
         _esusuAdapter.IsMemberEligibleToWithdrawROI(esusuCycleId,member);
     }
     
-    function IsMemberEligibleToWithdrawCapital(uint esusuCycleId, address member) public view returns(bool){
+    function IsMemberEligibleToWithdrawCapital(uint esusuCycleId, address member) external view returns(bool){
         _esusuAdapter.IsMemberEligibleToWithdrawCapital(esusuCycleId,member);
     }
     
     function GetCurrentEsusuCycleId() external view returns(uint){
         return _esusuAdapter.GetCurrentEsusuCycleId();
+    }
+    
+    function GetTotalDeposits() external view returns(uint)  {
+        return _esusuAdapter.GetTotalDeposits();
     }
     modifier onlyOwner(){
         require(_owner == msg.sender, "Only owner can make this call");
