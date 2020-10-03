@@ -8,8 +8,12 @@ import "./OwnableService.sol";
 import "./ITreasury.sol";
 import "./ISavingsConfig.sol";
 import "./ISavingsConfigSchema.sol";
+import "./IGroups.sol";
+import "./IRewardConfig.sol";
 
-//  TODO: add reward contract to reward people when they deposit funds that will be locked for a certain period
+
+//  TODO: add reward contract to calculate Xend Tokens reward for users when they deposit funds that will be locked for a certain period
+//  TODO: Add Xend Token interface and call mint function 
 
 library SafeMath {
     function add(uint256 a, uint256 b) internal pure returns (uint256) {
@@ -150,7 +154,8 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         uint TotalCapitalWithdrawn;      // Total Capital In Dai Withdrawn
         uint CycleStartTime;
         uint TotalShares;               //  Total yDai Shares 
-        uint MaxMembers;                //  Maximum number of members that can join this esusu cycle 
+        uint MaxMembers;                //  Maximum number of members that can join this esusu cycle
+        uint GroupId;                   //  Group this Esusu Cycle belongs to
     }
     
     struct Member{
@@ -168,11 +173,14 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
     
     /* Model definition ends */
     
-    constructor (address payable serviceContract, address payable treasuryContract, address savingsConfigContract, string memory feeRuleKey) public Ownable(serviceContract){
+    constructor (address payable serviceContract, address payable treasuryContract, address savingsConfigContract, 
+                    string memory feeRuleKey, address groupsContract, address rewardConfigContract) public Ownable(serviceContract){
         _owner = msg.sender;
         _treasuryContract = ITreasury(treasuryContract);
         _savingsConfigContract = ISavingsConfig(savingsConfigContract);
         _feeRuleKey = feeRuleKey;
+        _groupsContract = IGroups(groupsContract);
+        _rewardConfigContract = IRewardConfig(rewardConfigContract);
     }
     
     
@@ -180,7 +188,9 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
     address _owner;
     ITreasury _treasuryContract;
     ISavingsConfig _savingsConfigContract;
-
+    IGroups _groupsContract;
+    IRewardConfig _rewardConfigContract;
+    
     IDaiLendingService _iDaiLendingService;
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
     IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
@@ -206,11 +216,11 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
     }
     
-    
+
     /*
         NOTE: startTimeInSeconds is the time at which when elapsed, any one can start the cycle 
     */
-    function CreateEsusu(uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds, address owner, uint maxMembers) public onlyOwnerAndServiceContract {
+    function CreateEsusu(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds, address owner, uint maxMembers) public onlyOwnerAndServiceContract {
         
         EsusuCycle memory cycle;
         cycle.DepositAmount = depositAmount;
@@ -230,6 +240,8 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         //  Create mapping
         EsusuCycleMapping[EsusuCycleId] = cycle;
         
+         //  Assign groupId
+        EsusuCycleMapping[EsusuCycleId].GroupId = groupId;
         
         
         //  emit event
@@ -505,6 +517,7 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
             - Withdraw all the money from dai lending service
             - Send the member's deposited amount to his/her address 
             - re-invest the remaining dai until all members have taken their capital, then we set the cycle inactive
+        - Reward member with Xend Tokens 
         - Add this member to the EsusuCycleCapitalMapping
         - Check if TotalCapitalWithdrawn == TotalAmountDeposited && if TotalMembers == TotalBeneficiaries, if yes, set the Cycle to Inactive
 
@@ -535,6 +548,9 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         
         //  Now the Dai is in this contract, transfer it to the member 
         _dai.transfer(member, memberDeposit);
+        
+        //  Reward member with Xend Tokens
+        _rewardMember(cycle.TotalCycleDuration,member,memberDeposit);
         
         //  Get the yDaiSharesForContractAfterWithdrawal 
         uint yDaiSharesForContractAfterWithdrawal = _yDai.balanceOf(address(this));
@@ -790,5 +806,42 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         beneficiaryMapping[memberAddress] = memberROINet;
     }
     
+    
+    /*
+        - Get the group index by name
+        - Get the group information by index
+    */
+    function GetGroupInformationByName(string memory name) public view returns (uint groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
+        
+        //  Get the group index by name
+        (bool exists, uint index ) = _groupsContract.getGroupIndexerByName(name);
+        
+        //  Get the group id by index and return 
+
+        return _groupsContract.getGroupByIndex(index);
+    }
+    
+    /*
+        - Creates the group 
+        - returns the ID and other information
+        // TODO: test creating group
+    */
+    function CreateGroup(string memory name, string memory symbol, address groupCreator) public returns (uint groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
+        
+           _groupsContract.createGroup(name,symbol,groupCreator);
+           
+           return GetGroupInformationByName(name);
+          
+    }
+    
+    
+    function _rewardMember(uint totalCycleTime, address member, uint amount) internal {
+        
+        uint reward = _rewardConfigContract.CalculateEsusuReward(totalCycleTime, amount);
+        
+        //TODO: get Xend Token contract and mint token for member
+        //  
+    }
+
 }
 
