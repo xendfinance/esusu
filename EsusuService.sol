@@ -24,15 +24,26 @@ contract EsusuService{
         _esusuAdapter = EsusuAdapter(adapterAddress);   
     }
     
+    function GetGroupInformationByName(string calldata name) external view returns (uint groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
+        
+
+        return _esusuAdapter.GetGroupInformationByName(name);
+    }
     
     function GetEsusuAdapterAddress() external view returns (address){
         return address(_esusuAdapter);
     }
     
     
-    function CreateEsusu(uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds,uint maxMembers) external {
+    function CreateGroup(string calldata name, string calldata symbol) external {
         
-        _esusuAdapter.CreateEsusu(depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
+           _esusuAdapter.CreateGroup(name,symbol,msg.sender);
+           
+    }
+    
+    function CreateEsusu(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds,uint maxMembers) external {
+        
+        _esusuAdapter.CreateEsusu(groupId,depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
     }
     
     /*
@@ -54,16 +65,16 @@ contract EsusuService{
     }
     
      function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
-                                                            uint PayoutIntervalSeconds, uint CycleState, address Owner, 
+                                                            uint PayoutIntervalSeconds, uint CycleState, 
                                                             uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
                                                             uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
-                                                            uint TotalBeneficiaries){
+                                                            uint TotalBeneficiaries, uint MaxMembers){
     
         return _esusuAdapter.GetEsusuCycle(esusuCycleId);                                                        
     }
     
     function StartEsusuCycle(uint esusuCycleId) external {
-        _esusuAdapter.StartEsusuCycle(esusuCycleId,msg.sender);
+        _esusuAdapter.StartEsusuCycle(esusuCycleId);
     }
     
     function WithdrawROIFromEsusuCycle(uint esusuCycleId) external{
