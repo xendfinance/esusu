@@ -14,7 +14,6 @@ import "./IXendToken.sol";
 import "./SafeMath.sol";
 
 
-// TODO: Add function to update reward contract address, group contract address , treasuryContract address, savingsConfigContract address
 
 contract EsusuAdapter is Ownable, ISavingsConfigSchema {
 
@@ -169,7 +168,18 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         _xendTokenContract = IXendToken(xendTokenContract);
     }
     
-
+    //  TODO: Uncommenting this makes the code too large, find alternative 
+    // function UpdateDependencies (address payable treasuryContract, address savingsConfigContract, 
+    //                 string calldata feeRuleKey, address groupsContract, address rewardConfigContract,
+    //                 address xendTokenContract) external onlyOwner{
+    //     _treasuryContract = ITreasury(treasuryContract);
+    //     _savingsConfigContract = ISavingsConfig(savingsConfigContract);
+    //     _feeRuleKey = feeRuleKey;
+    //     _groupsContract = IGroups(groupsContract);
+    //     _rewardConfigContract = IRewardConfig(rewardConfigContract);
+    //     _xendTokenContract = IXendToken(xendTokenContract);
+    // }
+    
     function UpdateDaiLendingService(address daiLendingServiceContractAddress) onlyOwner external {
         _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
     }
@@ -807,7 +817,6 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
         
     }
 
-    
 
 }
 
