@@ -1,0 +1,1 @@
+const EsusuAdapter = artifacts.require("EsusuAdapter")
