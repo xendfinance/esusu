@@ -68,7 +68,7 @@ contract RewardConfig is Ownable {
     using SafeMath for uint256;
 
     
-    constructor(address esusuServiceContract, address groupServiceContract) public{
+    constructor(address esusuServiceContract, address groupServiceContract) public Ownable(serviceContract){
         
         iEsusuService = IEsusuService(esusuServiceContract);
         

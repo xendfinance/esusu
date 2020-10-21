@@ -15,7 +15,7 @@ import "./SafeMath.sol";
 
 
 
-contract EsusuAdapter is Ownable, ISavingsConfigSchema {
+contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
 
     /*
         Events to emit 
@@ -158,7 +158,7 @@ contract EsusuAdapter is Ownable, ISavingsConfigSchema {
 
     constructor (address payable serviceContract, address payable treasuryContract, address savingsConfigContract, 
                     string memory feeRuleKey, address groupsContract, address rewardConfigContract,
-                    address xendTokenContract) public Ownable(serviceContract){
+                    address xendTokenContract) public OwnableService(serviceContract){
         _owner = msg.sender;
         _treasuryContract = ITreasury(treasuryContract);
         _savingsConfigContract = ISavingsConfig(savingsConfigContract);

@@ -1,0 +1,2625 @@
+{
+  "contractName": "IGroupSchema",
+  "abi": [],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol\":\"IGroupSchema\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol\":{\"keccak256\":\"0x6a181fbc3fbf7b38adbb19dea1576bec36fbd48f12e195570554387b942bea9c\",\"urls\":[\"bzz-raw://888c9d70ae45cfc721dc10abd589a36926c252d000bc79230f8aa286851a1e3a\",\"dweb:/ipfs/QmaD6LBAu1JKowSpsYMWPiupfErwVx9p67f22EnbisZ5wK\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.6.6;\n\ninterface IGroupSchema {\n    struct Group {\n        bool exists;\n        uint256 id;\n        string name;\n        string symbol;\n        address payable creatorAddress;\n    }\n\n    struct Cycle {\n        bool exists;\n        uint256 id;\n        uint256 groupId;\n        uint256 numberOfDepositors;\n        uint256 cycleStartTimeStamp;\n        uint256 cycleDuration;\n        uint256 maximumSlots;\n        bool hasMaximumSlots;\n        uint256 cycleStakeAmount;\n        // represents the total stakes of every cycle member deposits\n        uint256 totalStakes;\n        //represents the total stakes of every cycle member withdrawal\n        uint256 stakesClaimed;\n        CycleStatus cycleStatus;\n        // represents the number of cycle stakes that user's have cashed out on before the cycle has ended\n        uint256 stakesClaimedBeforeMaturity;\n    }\n\n    struct CycleFinancial {\n        bool exists;\n        uint256 cycleId;\n        //total underlying asset deposited into contract\n        uint256 underlyingTotalDeposits;\n        //total underlying asset that have been withdrawn by cycle members\n        uint256 underlyingTotalWithdrawn;\n        // underlying amount gotten after lending period has ended and shares have been reedemed for underlying asset;\n        uint256 underlyingBalance;\n        // lending shares representation of amount deposited in lending protocol\n        uint256 derivativeBalance;\n        // represents the total underlying crypto amount that has been cashed out before the cycle ended\n        uint256 underylingBalanceClaimedBeforeMaturity;\n        // represents the total derivative crypto amount that has been cashed out on before the cycle ended\n        uint256 derivativeBalanceClaimedBeforeMaturity;\n    }\n\n    struct CycleMember {\n        bool exist;\n        uint256 cycleId;\n        uint256 groupId;\n        address payable _address;\n        uint256 totalLiquidityAsPenalty;\n        uint256 numberOfCycleStakes;\n        uint256 stakesClaimed;\n        bool hasWithdrawn;\n    }\n\n    struct Member {\n        bool exists;\n        address payable _address;\n    }\n\n    struct GroupMember {\n        bool exists;\n        address payable _address;\n        uint256 groupId;\n    }\n\n    struct RecordIndex {\n        bool exists;\n        uint256 index;\n    }\n\n    enum CycleStatus {NOT_STARTED, ONGOING, ENDED}\n}\n",
+  "sourcePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol",
+  "ast": {
+    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol",
+    "exportedSymbols": {
+      "IGroupSchema": [
+        2478
+      ]
+    },
+    "id": 2479,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2384,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:6"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2478,
+        "linearizedBaseContracts": [
+          2478
+        ],
+        "name": "IGroupSchema",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IGroupSchema.Group",
+            "id": 2395,
+            "members": [
+              {
+                "constant": false,
+                "id": 2386,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "77:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2385,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "77:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2388,
+                "mutability": "mutable",
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "98:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2387,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "98:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2390,
+                "mutability": "mutable",
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "118:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 2389,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "118:6:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2392,
+                "mutability": "mutable",
+                "name": "symbol",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "139:13:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 2391,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "139:6:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2394,
+                "mutability": "mutable",
+                "name": "creatorAddress",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "162:30:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2393,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "162:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Group",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "54:145:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.Cycle",
+            "id": 2422,
+            "members": [
+              {
+                "constant": false,
+                "id": 2397,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "228:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2396,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "228:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2399,
+                "mutability": "mutable",
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "249:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2398,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "249:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2401,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "269:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2400,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "269:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2403,
+                "mutability": "mutable",
+                "name": "numberOfDepositors",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "294:26:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2402,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "294:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2405,
+                "mutability": "mutable",
+                "name": "cycleStartTimeStamp",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "330:27:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2404,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "330:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2407,
+                "mutability": "mutable",
+                "name": "cycleDuration",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "367:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2406,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "367:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2409,
+                "mutability": "mutable",
+                "name": "maximumSlots",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "398:20:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2408,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "398:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2411,
+                "mutability": "mutable",
+                "name": "hasMaximumSlots",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "428:20:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2410,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "428:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2413,
+                "mutability": "mutable",
+                "name": "cycleStakeAmount",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "458:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2412,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "458:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2415,
+                "mutability": "mutable",
+                "name": "totalStakes",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "562:19:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2414,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "562:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2417,
+                "mutability": "mutable",
+                "name": "stakesClaimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "662:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2416,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "662:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2419,
+                "mutability": "mutable",
+                "name": "cycleStatus",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "693:23:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_CycleStatus_$2477",
+                  "typeString": "enum IGroupSchema.CycleStatus"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2418,
+                  "name": "CycleStatus",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2477,
+                  "src": "693:11:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_CycleStatus_$2477",
+                    "typeString": "enum IGroupSchema.CycleStatus"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2421,
+                "mutability": "mutable",
+                "name": "stakesClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "833:35:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2420,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "833:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Cycle",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "205:670:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleFinancial",
+            "id": 2439,
+            "members": [
+              {
+                "constant": false,
+                "id": 2424,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "913:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2423,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "913:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2426,
+                "mutability": "mutable",
+                "name": "cycleId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "934:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2425,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "934:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2428,
+                "mutability": "mutable",
+                "name": "underlyingTotalDeposits",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1016:31:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2427,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1016:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2430,
+                "mutability": "mutable",
+                "name": "underlyingTotalWithdrawn",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1132:32:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2429,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1132:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2432,
+                "mutability": "mutable",
+                "name": "underlyingBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1293:25:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2431,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1293:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2434,
+                "mutability": "mutable",
+                "name": "derivativeBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1409:25:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2433,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1409:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2436,
+                "mutability": "mutable",
+                "name": "underylingBalanceClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1549:46:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2435,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1549:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2438,
+                "mutability": "mutable",
+                "name": "derivativeBalanceClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1713:46:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2437,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1713:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "CycleFinancial",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "881:885:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleMember",
+            "id": 2456,
+            "members": [
+              {
+                "constant": false,
+                "id": 2441,
+                "mutability": "mutable",
+                "name": "exist",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1801:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2440,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1801:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2443,
+                "mutability": "mutable",
+                "name": "cycleId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1821:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2442,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1821:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2445,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1846:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2444,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1846:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2447,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1871:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2446,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1871:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2449,
+                "mutability": "mutable",
+                "name": "totalLiquidityAsPenalty",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1905:31:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2448,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1905:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2451,
+                "mutability": "mutable",
+                "name": "numberOfCycleStakes",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1946:27:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2450,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1946:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2453,
+                "mutability": "mutable",
+                "name": "stakesClaimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1983:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2452,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1983:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2455,
+                "mutability": "mutable",
+                "name": "hasWithdrawn",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "2014:17:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2454,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2014:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "CycleMember",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "1772:266:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.Member",
+            "id": 2461,
+            "members": [
+              {
+                "constant": false,
+                "id": 2458,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2461,
+                "src": "2068:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2457,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2068:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2460,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2461,
+                "src": "2089:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2459,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2089:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Member",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2044:76:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.GroupMember",
+            "id": 2468,
+            "members": [
+              {
+                "constant": false,
+                "id": 2463,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2155:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2462,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2155:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2465,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2176:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2464,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2176:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2467,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2210:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2466,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2210:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "GroupMember",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2126:106:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.RecordIndex",
+            "id": 2473,
+            "members": [
+              {
+                "constant": false,
+                "id": 2470,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "2267:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2469,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2267:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2472,
+                "mutability": "mutable",
+                "name": "index",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "2288:13:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2471,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2288:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "RecordIndex",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2238:70:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleStatus",
+            "id": 2477,
+            "members": [
+              {
+                "id": 2474,
+                "name": "NOT_STARTED",
+                "nodeType": "EnumValue",
+                "src": "2332:11:6"
+              },
+              {
+                "id": 2475,
+                "name": "ONGOING",
+                "nodeType": "EnumValue",
+                "src": "2345:7:6"
+              },
+              {
+                "id": 2476,
+                "name": "ENDED",
+                "nodeType": "EnumValue",
+                "src": "2354:5:6"
+              }
+            ],
+            "name": "CycleStatus",
+            "nodeType": "EnumDefinition",
+            "src": "2314:46:6"
+          }
+        ],
+        "scope": 2479,
+        "src": "25:2337:6"
+      }
+    ],
+    "src": "0:2363:6"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol",
+    "exportedSymbols": {
+      "IGroupSchema": [
+        2478
+      ]
+    },
+    "id": 2479,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 2384,
+        "literals": [
+          "solidity",
+          "^",
+          "0.6",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:6"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 2478,
+        "linearizedBaseContracts": [
+          2478
+        ],
+        "name": "IGroupSchema",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "canonicalName": "IGroupSchema.Group",
+            "id": 2395,
+            "members": [
+              {
+                "constant": false,
+                "id": 2386,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "77:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2385,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "77:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2388,
+                "mutability": "mutable",
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "98:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2387,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "98:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2390,
+                "mutability": "mutable",
+                "name": "name",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "118:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 2389,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "118:6:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2392,
+                "mutability": "mutable",
+                "name": "symbol",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "139:13:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_string_storage_ptr",
+                  "typeString": "string"
+                },
+                "typeName": {
+                  "id": 2391,
+                  "name": "string",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "139:6:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_storage_ptr",
+                    "typeString": "string"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2394,
+                "mutability": "mutable",
+                "name": "creatorAddress",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2395,
+                "src": "162:30:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2393,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "162:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Group",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "54:145:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.Cycle",
+            "id": 2422,
+            "members": [
+              {
+                "constant": false,
+                "id": 2397,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "228:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2396,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "228:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2399,
+                "mutability": "mutable",
+                "name": "id",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "249:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2398,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "249:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2401,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "269:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2400,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "269:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2403,
+                "mutability": "mutable",
+                "name": "numberOfDepositors",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "294:26:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2402,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "294:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2405,
+                "mutability": "mutable",
+                "name": "cycleStartTimeStamp",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "330:27:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2404,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "330:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2407,
+                "mutability": "mutable",
+                "name": "cycleDuration",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "367:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2406,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "367:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2409,
+                "mutability": "mutable",
+                "name": "maximumSlots",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "398:20:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2408,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "398:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2411,
+                "mutability": "mutable",
+                "name": "hasMaximumSlots",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "428:20:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2410,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "428:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2413,
+                "mutability": "mutable",
+                "name": "cycleStakeAmount",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "458:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2412,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "458:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2415,
+                "mutability": "mutable",
+                "name": "totalStakes",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "562:19:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2414,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "562:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2417,
+                "mutability": "mutable",
+                "name": "stakesClaimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "662:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2416,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "662:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2419,
+                "mutability": "mutable",
+                "name": "cycleStatus",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "693:23:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_enum$_CycleStatus_$2477",
+                  "typeString": "enum IGroupSchema.CycleStatus"
+                },
+                "typeName": {
+                  "contractScope": null,
+                  "id": 2418,
+                  "name": "CycleStatus",
+                  "nodeType": "UserDefinedTypeName",
+                  "referencedDeclaration": 2477,
+                  "src": "693:11:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_enum$_CycleStatus_$2477",
+                    "typeString": "enum IGroupSchema.CycleStatus"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2421,
+                "mutability": "mutable",
+                "name": "stakesClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2422,
+                "src": "833:35:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2420,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "833:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Cycle",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "205:670:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleFinancial",
+            "id": 2439,
+            "members": [
+              {
+                "constant": false,
+                "id": 2424,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "913:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2423,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "913:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2426,
+                "mutability": "mutable",
+                "name": "cycleId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "934:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2425,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "934:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2428,
+                "mutability": "mutable",
+                "name": "underlyingTotalDeposits",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1016:31:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2427,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1016:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2430,
+                "mutability": "mutable",
+                "name": "underlyingTotalWithdrawn",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1132:32:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2429,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1132:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2432,
+                "mutability": "mutable",
+                "name": "underlyingBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1293:25:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2431,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1293:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2434,
+                "mutability": "mutable",
+                "name": "derivativeBalance",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1409:25:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2433,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1409:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2436,
+                "mutability": "mutable",
+                "name": "underylingBalanceClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1549:46:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2435,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1549:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2438,
+                "mutability": "mutable",
+                "name": "derivativeBalanceClaimedBeforeMaturity",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2439,
+                "src": "1713:46:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2437,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1713:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "CycleFinancial",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "881:885:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleMember",
+            "id": 2456,
+            "members": [
+              {
+                "constant": false,
+                "id": 2441,
+                "mutability": "mutable",
+                "name": "exist",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1801:10:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2440,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1801:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2443,
+                "mutability": "mutable",
+                "name": "cycleId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1821:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2442,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1821:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2445,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1846:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2444,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1846:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2447,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1871:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2446,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1871:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2449,
+                "mutability": "mutable",
+                "name": "totalLiquidityAsPenalty",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1905:31:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2448,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1905:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2451,
+                "mutability": "mutable",
+                "name": "numberOfCycleStakes",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1946:27:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2450,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1946:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2453,
+                "mutability": "mutable",
+                "name": "stakesClaimed",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "1983:21:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2452,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "1983:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2455,
+                "mutability": "mutable",
+                "name": "hasWithdrawn",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2456,
+                "src": "2014:17:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2454,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2014:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "CycleMember",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "1772:266:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.Member",
+            "id": 2461,
+            "members": [
+              {
+                "constant": false,
+                "id": 2458,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2461,
+                "src": "2068:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2457,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2068:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2460,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2461,
+                "src": "2089:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2459,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2089:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "Member",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2044:76:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.GroupMember",
+            "id": 2468,
+            "members": [
+              {
+                "constant": false,
+                "id": 2463,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2155:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2462,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2155:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2465,
+                "mutability": "mutable",
+                "name": "_address",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2176:24:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_address_payable",
+                  "typeString": "address payable"
+                },
+                "typeName": {
+                  "id": 2464,
+                  "name": "address",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2176:15:6",
+                  "stateMutability": "payable",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address_payable",
+                    "typeString": "address payable"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2467,
+                "mutability": "mutable",
+                "name": "groupId",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2468,
+                "src": "2210:15:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2466,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2210:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "GroupMember",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2126:106:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.RecordIndex",
+            "id": 2473,
+            "members": [
+              {
+                "constant": false,
+                "id": 2470,
+                "mutability": "mutable",
+                "name": "exists",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "2267:11:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_bool",
+                  "typeString": "bool"
+                },
+                "typeName": {
+                  "id": 2469,
+                  "name": "bool",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2267:4:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              },
+              {
+                "constant": false,
+                "id": 2472,
+                "mutability": "mutable",
+                "name": "index",
+                "nodeType": "VariableDeclaration",
+                "overrides": null,
+                "scope": 2473,
+                "src": "2288:13:6",
+                "stateVariable": false,
+                "storageLocation": "default",
+                "typeDescriptions": {
+                  "typeIdentifier": "t_uint256",
+                  "typeString": "uint256"
+                },
+                "typeName": {
+                  "id": 2471,
+                  "name": "uint256",
+                  "nodeType": "ElementaryTypeName",
+                  "src": "2288:7:6",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  }
+                },
+                "value": null,
+                "visibility": "internal"
+              }
+            ],
+            "name": "RecordIndex",
+            "nodeType": "StructDefinition",
+            "scope": 2478,
+            "src": "2238:70:6",
+            "visibility": "public"
+          },
+          {
+            "canonicalName": "IGroupSchema.CycleStatus",
+            "id": 2477,
+            "members": [
+              {
+                "id": 2474,
+                "name": "NOT_STARTED",
+                "nodeType": "EnumValue",
+                "src": "2332:11:6"
+              },
+              {
+                "id": 2475,
+                "name": "ONGOING",
+                "nodeType": "EnumValue",
+                "src": "2345:7:6"
+              },
+              {
+                "id": 2476,
+                "name": "ENDED",
+                "nodeType": "EnumValue",
+                "src": "2354:5:6"
+              }
+            ],
+            "name": "CycleStatus",
+            "nodeType": "EnumDefinition",
+            "src": "2314:46:6"
+          }
+        ],
+        "scope": 2479,
+        "src": "25:2337:6"
+      }
+    ],
+    "src": "0:2363:6"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.6+commit.6c089d02.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.2.5",
+  "updatedAt": "2020-10-21T14:44:27.552Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}

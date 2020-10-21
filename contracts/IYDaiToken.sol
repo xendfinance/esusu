@@ -1,6 +1,6 @@
 pragma solidity ^0.6.6;
 
-import 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/token/ERC20/IERC20.sol';
+import './IERC20.sol';
 
 /*
     This interface returns the address of the YDai Token contract
