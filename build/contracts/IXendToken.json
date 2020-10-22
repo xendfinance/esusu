@@ -20,26 +20,26 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol\":\"IXendToken\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol\":{\"keccak256\":\"0xa6b5e2e326eae2956d9c29e1aeaaf435105262fb8ab552ff20d06c2c3498cfb6\",\"urls\":[\"bzz-raw://ab1a89c918ec589ab45da6dd4d31beea4e24299ef491b3827955c10ca812cdc4\",\"dweb:/ipfs/Qma1RZYyQDCiRvsiwxK22uGXkZFAyZnk31MZpiZgVYgXQa\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address payable\",\"name\":\"recipient\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"mint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/XendToken/IXendToken.sol\":\"IXendToken\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/XendToken/IXendToken.sol\":{\"keccak256\":\"0xa6b5e2e326eae2956d9c29e1aeaaf435105262fb8ab552ff20d06c2c3498cfb6\",\"urls\":[\"bzz-raw://ab1a89c918ec589ab45da6dd4d31beea4e24299ef491b3827955c10ca812cdc4\",\"dweb:/ipfs/Qma1RZYyQDCiRvsiwxK22uGXkZFAyZnk31MZpiZgVYgXQa\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
   "sourceMap": "",
   "deployedSourceMap": "",
   "source": "pragma solidity ^0.6.6;\n\ninterface IXendToken {\n    function mint(address payable recipient, uint256 amount) external;\n}\n",
-  "sourcePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol",
+  "sourcePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/XendToken/IXendToken.sol",
   "ast": {
-    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol",
+    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/XendToken/IXendToken.sol",
     "exportedSymbols": {
       "IXendToken": [
-        2906
+        7776
       ]
     },
-    "id": 2907,
+    "id": 7777,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2898,
+        "id": 7768,
         "literals": [
           "solidity",
           "^",
@@ -47,7 +47,7 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:12"
+        "src": "0:23:31"
       },
       {
         "abstract": false,
@@ -56,9 +56,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 2906,
+        "id": 7776,
         "linearizedBaseContracts": [
-          2906
+          7776
         ],
         "name": "IXendToken",
         "nodeType": "ContractDefinition",
@@ -67,7 +67,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "40c10f19",
-            "id": 2905,
+            "id": 7775,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -75,18 +75,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 2903,
+              "id": 7773,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2900,
+                  "id": 7770,
                   "mutability": "mutable",
                   "name": "recipient",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2905,
-                  "src": "66:25:12",
+                  "scope": 7775,
+                  "src": "66:25:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -94,10 +94,10 @@
                     "typeString": "address payable"
                   },
                   "typeName": {
-                    "id": 2899,
+                    "id": 7769,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "66:15:12",
+                    "src": "66:15:31",
                     "stateMutability": "payable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address_payable",
@@ -109,13 +109,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 2902,
+                  "id": 7772,
                   "mutability": "mutable",
                   "name": "amount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2905,
-                  "src": "93:14:12",
+                  "scope": 7775,
+                  "src": "93:14:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -123,10 +123,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2901,
+                    "id": 7771,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "93:7:12",
+                    "src": "93:7:31",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -136,39 +136,39 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "65:43:12"
+              "src": "65:43:31"
             },
             "returnParameters": {
-              "id": 2904,
+              "id": 7774,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "117:0:12"
+              "src": "117:0:31"
             },
-            "scope": 2906,
-            "src": "52:66:12",
+            "scope": 7776,
+            "src": "52:66:31",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2907,
-        "src": "25:95:12"
+        "scope": 7777,
+        "src": "25:95:31"
       }
     ],
-    "src": "0:121:12"
+    "src": "0:121:31"
   },
   "legacyAST": {
-    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol",
+    "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/XendToken/IXendToken.sol",
     "exportedSymbols": {
       "IXendToken": [
-        2906
+        7776
       ]
     },
-    "id": 2907,
+    "id": 7777,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 2898,
+        "id": 7768,
         "literals": [
           "solidity",
           "^",
@@ -176,7 +176,7 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:12"
+        "src": "0:23:31"
       },
       {
         "abstract": false,
@@ -185,9 +185,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 2906,
+        "id": 7776,
         "linearizedBaseContracts": [
-          2906
+          7776
         ],
         "name": "IXendToken",
         "nodeType": "ContractDefinition",
@@ -196,7 +196,7 @@
             "body": null,
             "documentation": null,
             "functionSelector": "40c10f19",
-            "id": 2905,
+            "id": 7775,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
@@ -204,18 +204,18 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 2903,
+              "id": 7773,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 2900,
+                  "id": 7770,
                   "mutability": "mutable",
                   "name": "recipient",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2905,
-                  "src": "66:25:12",
+                  "scope": 7775,
+                  "src": "66:25:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -223,10 +223,10 @@
                     "typeString": "address payable"
                   },
                   "typeName": {
-                    "id": 2899,
+                    "id": 7769,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "66:15:12",
+                    "src": "66:15:31",
                     "stateMutability": "payable",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address_payable",
@@ -238,13 +238,13 @@
                 },
                 {
                   "constant": false,
-                  "id": 2902,
+                  "id": 7772,
                   "mutability": "mutable",
                   "name": "amount",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 2905,
-                  "src": "93:14:12",
+                  "scope": 7775,
+                  "src": "93:14:31",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -252,10 +252,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 2901,
+                    "id": 7771,
                     "name": "uint256",
                     "nodeType": "ElementaryTypeName",
-                    "src": "93:7:12",
+                    "src": "93:7:31",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -265,26 +265,26 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "65:43:12"
+              "src": "65:43:31"
             },
             "returnParameters": {
-              "id": 2904,
+              "id": 7774,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "117:0:12"
+              "src": "117:0:31"
             },
-            "scope": 2906,
-            "src": "52:66:12",
+            "scope": 7776,
+            "src": "52:66:31",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 2907,
-        "src": "25:95:12"
+        "scope": 7777,
+        "src": "25:95:31"
       }
     ],
-    "src": "0:121:12"
+    "src": "0:121:31"
   },
   "compiler": {
     "name": "solc",
@@ -292,7 +292,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-21T14:44:27.622Z",
+  "updatedAt": "2020-10-22T09:18:35.751Z",
   "devdoc": {
     "methods": {}
   },

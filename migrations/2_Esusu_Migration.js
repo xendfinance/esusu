@@ -6,6 +6,7 @@ const SavingsConfigContract = artifacts.require("SavingsConfig")
 const EsusuServiceContract = artifacts.require("EsusuService")
 const GroupsContract = artifacts.require("Groups")
 const RewardConfigContract = artifacts.require("RewardConfig")
+const xendTokenContract = artifacts.require("XendToken")
 
 
 module.exports = async (deployer) => {
@@ -37,6 +38,11 @@ module.exports = async (deployer) => {
     await deployer.deploy(RewardConfigContract, EsusuServiceContract.address, GroupsContract.address)
 
     console.log("RewardConfigContract address: " + RewardConfigContract.address)
+
+    await deployer.deploy(xendTokenContract)
+
+    console.log("xendTokenContract address: " + xendTokenContract.address)
+    
 
 }
 
