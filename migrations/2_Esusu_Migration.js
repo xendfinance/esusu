@@ -1,50 +1,69 @@
-//const EsusuAdapter = artifacts.require("EsusuAdapter");
-const DaiLendingService = artifacts.require("DaiLendingService")
-const DaiLendingAdapter = artifacts.require("DaiLendingAdapter")
-const TreasuryContract = artifacts.require("Treasury")
-const SavingsConfigContract = artifacts.require("SavingsConfig")
-const EsusuServiceContract = artifacts.require("EsusuService")
-const GroupsContract = artifacts.require("Groups")
-const RewardConfigContract = artifacts.require("RewardConfig")
-const xendTokenContract = artifacts.require("XendToken")
-
+const EsusuAdapter = artifacts.require("EsusuAdapter");
+const DaiLendingService = artifacts.require("DaiLendingService");
+const DaiLendingAdapter = artifacts.require("DaiLendingAdapter");
+const TreasuryContract = artifacts.require("Treasury");
+const SavingsConfigContract = artifacts.require("SavingsConfig");
+const EsusuServiceContract = artifacts.require("EsusuService");
+const GroupsContract = artifacts.require("Groups");
+const RewardConfigContract = artifacts.require("RewardConfig");
+const xendTokenContract = artifacts.require("XendToken");
 
 module.exports = async (deployer) => {
+  await deployer.deploy(DaiLendingService);
 
-    await deployer.deploy(DaiLendingService)
+  await deployer.deploy(DaiLendingAdapter, DaiLendingService.address);
 
-    await deployer.deploy(DaiLendingAdapter,DaiLendingService.address);
+  console.log(
+    "DaiLendingService Contract address: " + DaiLendingService.address
+  );
 
-    console.log("DaiLendingService Contract address: " + DaiLendingService.address);
+  console.log(
+    "DaiLendingAdapterContract address: " + DaiLendingAdapter.address
+  );
 
-    console.log("DaiLendingAdapterContract address: "+DaiLendingAdapter.address )
+  await deployer.deploy(TreasuryContract);
 
-    await deployer.deploy(TreasuryContract)
+  console.log("TreasuryContract address: " + TreasuryContract.address);
 
-    console.log("TreasuryContract address: " + TreasuryContract.address)
+  await deployer.deploy(SavingsConfigContract);
 
-    await deployer.deploy(SavingsConfigContract)
+  console.log(
+    "SavingsConfigContract address: " + SavingsConfigContract.address
+  );
 
-    console.log("SavingsConfigContract address: " + SavingsConfigContract.address)
+  await deployer.deploy(EsusuServiceContract);
 
-    await deployer.deploy(EsusuServiceContract)
+  console.log("EsusuServiceContract address: " + EsusuServiceContract.address);
 
-    console.log("EsusuServiceContract address: " + EsusuServiceContract.address)
+  await deployer.deploy(GroupsContract);
 
-    await deployer.deploy(GroupsContract)
+  console.log("GroupsContract address: " + GroupsContract.address);
 
-    console.log("GroupsContract address: " + GroupsContract.address)
+  await deployer.deploy(
+    RewardConfigContract,
+    EsusuServiceContract.address,
+    GroupsContract.address
+  );
 
-    await deployer.deploy(RewardConfigContract, EsusuServiceContract.address, GroupsContract.address)
+  console.log("RewardConfigContract address: " + RewardConfigContract.address);
 
-    console.log("RewardConfigContract address: " + RewardConfigContract.address)
+  await deployer.deploy(xendTokenContract, "Xend Token", "XTK", 18, 2000000);
 
-    await deployer.deploy(xendTokenContract)
+  console.log("xendTokenContract address: " + xendTokenContract.address);
 
-    console.log("xendTokenContract address: " + xendTokenContract.address)
-    
+  await deployer.deploy(
+    EsusuAdapter,
+    EsusuServiceContract.address,
+    TreasuryContract.address,
+    SavingsConfigContract.address,
+    "Njoku",
+    GroupsContract.address,
+    RewardConfigContract.address,
+    xendTokenContract.address
+  );
 
-}
+  console.log("EsusuAdapter address: " + EsusuAdapter.address)
+};
 
 // module.exports = async (deployer) =>{
 //     const treasuryContract = 0xd9145CCE52D386f254917e481eB44e9943F39138;

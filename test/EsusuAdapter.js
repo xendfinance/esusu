@@ -1,16 +1,19 @@
 const EsusuAdapter = artifacts.require("EsusuAdapter")
 
-let contractInstance;
+let esusuAdapterContract;
 
 contract("EsusuAdapter", (accounts) => {
     beforeEach(async () => {
-        contractInstance = await EsusuAdapter.deployed();
+        esusuAdapterContract = await EsusuAdapter.deployed();
     });
 
-    //it should create a group and return the id
+    it("Should deploy the EsusuAdapter smart contracts", async () => {
+        assert(esusuAdapterContract !== "");
+    })
 
-    it("should create a group", async () => {
-        const result = await contractInstance.CreateGroup("NjokuEsusuGroup", "NSU", {from : accounts[0]});
+    //it should return total deposits
+    it("should get total deposits", async () => {
+        const result = await esusuAdapterContract.GetTotalDeposits();
 
         console.log(result)
     })
