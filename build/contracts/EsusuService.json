@@ -64,7 +64,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -77,7 +78,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -190,7 +192,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -264,7 +267,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -327,7 +331,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -351,7 +356,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -364,7 +370,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [],
@@ -377,7 +384,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     }
   ],
   "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"groupId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"depositAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"payoutIntervalSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"startTimeInSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"maxMembers\",\"type\":\"uint256\"}],\"name\":\"CreateEsusu\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"symbol\",\"type\":\"string\"}],\"name\":\"CreateGroup\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"GetCurrentEsusuCycleId\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"GetEsusuAdapterAddress\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"}],\"name\":\"GetEsusuCycle\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"CycleId\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"DepositAmount\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"PayoutIntervalSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"CycleState\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalMembers\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalAmountDeposited\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalShares\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalCycleDurationInSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalCapitalWithdrawn\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"CycleStartTimeInSeconds\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalBeneficiaries\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"MaxMembers\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"name\",\"type\":\"string\"}],\"name\":\"GetGroupInformationByName\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"groupId\",\"type\":\"uint256\"},{\"internalType\":\"string\",\"name\":\"groupName\",\"type\":\"string\"},{\"internalType\":\"string\",\"name\":\"groupSymbol\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"groupCreatorAddress\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"memberAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"}],\"name\":\"GetMemberCycleInfo\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"CycleId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"MemberId\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"TotalAmountDepositedInCycle\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"TotalPayoutReceivedInCycle\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"memberPosition\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"GetTotalDeposits\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"member\",\"type\":\"address\"}],\"name\":\"IsMemberEligibleToWithdrawCapital\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"member\",\"type\":\"address\"}],\"name\":\"IsMemberEligibleToWithdrawROI\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"member\",\"type\":\"address\"}],\"name\":\"JoinEsusu\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"}],\"name\":\"StartEsusuCycle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"TransferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"adapterAddress\",\"type\":\"address\"}],\"name\":\"UpdateAdapter\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"}],\"name\":\"WithdrawCapitalFromEsusuCycle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"esusuCycleId\",\"type\":\"uint256\"}],\"name\":\"WithdrawROIFromEsusuCycle\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/EsusuService.sol\":\"EsusuService\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/njokuscript/Desktop/programming/esusu/contracts/EsusuAdapter.sol\":{\"keccak256\":\"0xf33c980acc2a10ae761c292d86c0937fce543a0f51681ccee37601acbdf6c8a7\",\"urls\":[\"bzz-raw://a88d9207df40bd2b0cc32885fa7d8196840acfcff271da03d4d7fcf0c616f3be\",\"dweb:/ipfs/QmbTnAmLhfabqEq1FRjSmUWGaHEuWkp1UYGgeQtn9QioEq\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/EsusuService.sol\":{\"keccak256\":\"0x32f5b1a63337659b8acf0b99b931e350e02906b979b8bd3285faea5e93bd3491\",\"urls\":[\"bzz-raw://27a3e2f758c4eb21e927cb0937f8a5f8820c10ee0aac636d8b527038d95aa540\",\"dweb:/ipfs/QmadvmVT4vmDeJQ24g9cafavi8Vbce4Up6D23ooAoSXmqU\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IDaiLendingService.sol\":{\"keccak256\":\"0x7c63651f0ec48339038864ea19917873af5dc4d8ab7bd68dc7ef4d058f3f6a39\",\"urls\":[\"bzz-raw://749e1b5831518a28c31e523316b7d480f962cc72e88a3467339daed7c83a31f5\",\"dweb:/ipfs/QmcqPHKFwQymu2JUobwafgT2DV4DK51zZvUWWK8vef4Qau\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IDaiToken.sol\":{\"keccak256\":\"0x63faa52271a8e90eb52af1013ebb7cc2dfdc36516a6775a7b1faea2d7c95a6e2\",\"urls\":[\"bzz-raw://79f14d5f3c9ec3810b6f36660d7e2bc1485fee574e776cd03c8a46fdf398d0be\",\"dweb:/ipfs/QmX6zuWz5M2DhAitVDwP8qJN5CBYPCVKef1f2x6SnCf9kM\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IERC20.sol\":{\"keccak256\":\"0xdb06133df15b4633b2d3006ec2e96cb434312b43357b5c205145695014884d9c\",\"urls\":[\"bzz-raw://01bbd5c896bd8ff6e3d52b7e19da4ba32e7f9c221c4b2b606ccc296b80b66364\",\"dweb:/ipfs/QmP6bHqUauTtn6TP9aNDtXNNbKm2HN2wSYnRx93WSCzdU4\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IGroupSchema.sol\":{\"keccak256\":\"0x6a181fbc3fbf7b38adbb19dea1576bec36fbd48f12e195570554387b942bea9c\",\"urls\":[\"bzz-raw://888c9d70ae45cfc721dc10abd589a36926c252d000bc79230f8aa286851a1e3a\",\"dweb:/ipfs/QmaD6LBAu1JKowSpsYMWPiupfErwVx9p67f22EnbisZ5wK\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IGroups.sol\":{\"keccak256\":\"0x75e7fbca5fa6f7a393da1330f965891661a1346c2c1adf5d6f21765abb7d7a08\",\"urls\":[\"bzz-raw://5c020b664a9197ca3d6a26b63a3f1395dee8310bd432e25d213fdb1e74973789\",\"dweb:/ipfs/QmRkPFZGR3h3MCTzC5ExzDuCtL8JYdKUeHqseYBM92AvQM\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IRewardConfig.sol\":{\"keccak256\":\"0x790f0bb9fe56fa5e0dbf492a785d17c933774dd0bb3fc5a94f424b83a97cdffe\",\"urls\":[\"bzz-raw://8d6ddcdabdca20107c19c67466a4d0f4f99e9c1ee289410aed2b3d2261d2be4d\",\"dweb:/ipfs/QmPUrqiNd8PE4cRvgTfdK1h54eLkAaYh38ibuk4bGbToPw\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/ISavingsConfig.sol\":{\"keccak256\":\"0xd4a1e38e1cc688e008b08b14d216d9e0f76e9500b2319c5f1a48fe22e9d714d1\",\"urls\":[\"bzz-raw://4aa24efcacab8d71c0937eeea13aaceaceafd191020c935a559f1a1d59da5bc4\",\"dweb:/ipfs/QmUpKbqPpmLSNEcz3aedR3eHiutwuYtpL4WcgLFPRZDC7p\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/ISavingsConfigSchema.sol\":{\"keccak256\":\"0x553eae6019bf849920c8c31e6ae9c0ebcc2410a14a031928119dafe0b2bc3183\",\"urls\":[\"bzz-raw://d77a7ae99b14920c4623e15a1a2a679df92c8fc88e36715b3314f2759ae6e67c\",\"dweb:/ipfs/QmPsydY2PARERVqMyJApDDT5eq1Qvo4wyAa9KYnu8PsT4c\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/ITreasury.sol\":{\"keccak256\":\"0x431133182de3790e823a22cadd271c3362f2d4a17a8eba779fb41e80d8f0c923\",\"urls\":[\"bzz-raw://1f895ba8765aa8433706f2018b5d6278c2a3557b18e0252f11ed16b1774cc7aa\",\"dweb:/ipfs/QmTQ4AsLo9kEHzSmXtbNRbkoAhJZczYM4jXL3wxX4JkmZu\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IXendToken.sol\":{\"keccak256\":\"0xa6b5e2e326eae2956d9c29e1aeaaf435105262fb8ab552ff20d06c2c3498cfb6\",\"urls\":[\"bzz-raw://ab1a89c918ec589ab45da6dd4d31beea4e24299ef491b3827955c10ca812cdc4\",\"dweb:/ipfs/Qma1RZYyQDCiRvsiwxK22uGXkZFAyZnk31MZpiZgVYgXQa\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/IYDaiToken.sol\":{\"keccak256\":\"0xcf5aee549b59ebb144cef2a9a6489a8a5ce1288118f8dc0cf4971c1de016f132\",\"urls\":[\"bzz-raw://b30eaaa095aec679c260dfb5b5a9eb9519ec90e78ebac14b90f6e5c3818166f9\",\"dweb:/ipfs/QmR84mZr5Zhq81bcH1iUuq4CRDFs9VZnM3zMpL2SWpXDaE\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/OwnableService.sol\":{\"keccak256\":\"0x2020668d462c85ab133190681896f14290df0e6d8ea0c1fe626207ee73119a89\",\"urls\":[\"bzz-raw://f69d91e39dc267c6c3c039c8b23b230dfb68d9ccabe7f91318762d5b45ac8649\",\"dweb:/ipfs/QmUgRJFermCsv1TGsxt9njcUcjrYfBcScQ5xS2xyTnrwsu\"]},\"/Users/njokuscript/Desktop/programming/esusu/contracts/SafeMath.sol\":{\"keccak256\":\"0xd1dad956f7ac7ff1022aa66860b0f2daaee93707f4527e009596b8414d86e51d\",\"urls\":[\"bzz-raw://6b32d7e40811adb20d6489e21f9d832dfe5fda28d41ab82bcde1c1239444762e\",\"dweb:/ipfs/QmNR3VmwUH4CmcwtUJpLskFnWbzEJzL45v4P6wgqXqdHH4\"]}},\"version\":1}",
@@ -7904,9 +7912,17 @@
     "name": "solc",
     "version": "0.6.6+commit.6c089d02.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "1": {
+      "events": {},
+      "links": {},
+      "address": "0x766592dA3ec63701777CDe78e75BEaF1A935a400",
+      "transactionHash": "0x22d48e7f29fc29011606bde54fb25bf92d085a79d35f45b331ac1fd977939ef4"
+    }
+  },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-22T08:16:21.243Z",
+  "updatedAt": "2020-10-22T08:44:22.121Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

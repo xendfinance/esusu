@@ -2,6 +2,11 @@
 const DaiLendingService = artifacts.require("DaiLendingService")
 const DaiLendingAdapter = artifacts.require("DaiLendingAdapter")
 const TreasuryContract = artifacts.require("Treasury")
+const SavingsConfigContract = artifacts.require("SavingsConfig")
+const EsusuServiceContract = artifacts.require("EsusuService")
+const GroupsContract = artifacts.require("Groups")
+const RewardConfigContract = artifacts.require("RewardConfig")
+
 
 module.exports = async (deployer) => {
 
@@ -16,6 +21,22 @@ module.exports = async (deployer) => {
     await deployer.deploy(TreasuryContract)
 
     console.log("TreasuryContract address: " + TreasuryContract.address)
+
+    await deployer.deploy(SavingsConfigContract)
+
+    console.log("SavingsConfigContract address: " + SavingsConfigContract.address)
+
+    await deployer.deploy(EsusuServiceContract)
+
+    console.log("EsusuServiceContract address: " + EsusuServiceContract.address)
+
+    await deployer.deploy(GroupsContract)
+
+    console.log("GroupsContract address: " + GroupsContract.address)
+
+    await deployer.deploy(RewardConfigContract, EsusuServiceContract.address, GroupsContract.address)
+
+    console.log("RewardConfigContract address: " + RewardConfigContract.address)
 
 }
 
