@@ -1,6 +1,8 @@
   
     /**
-     *  @todo   Tests to write
+     *  @todo    
+     *  Ensure to install web3 before running this test -> npm install web3
+     *  Tests to write:
      *  1.  Create Group                        -   Done  
      *  2.  Get Group By Name                   -   Done
      *  3.  Create Esusu & Get current ID       -   Done
