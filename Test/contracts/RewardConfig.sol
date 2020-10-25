@@ -248,5 +248,7 @@ contract RewardConfig is Ownable {
     function SetRewardActive(bool isActive) onlyOwner external {
         RewardActive = isActive;
     }
-    
+    function GetRewardActive() external view returns(bool rewardActiveStatus){
+        return RewardActive;
+    }    
 }
