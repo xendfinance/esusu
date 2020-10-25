@@ -20,6 +20,10 @@
      *  15. Withraw Capital for 3 accounts          -   Done
      */
 
+    //  Uncomment if you want to skip this test
+    // if(true){
+    //     return;
+    // }
     console.log("********************** Running Esusu Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');

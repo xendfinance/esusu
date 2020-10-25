@@ -12,7 +12,11 @@
      *  8.  Deactivete the reward system                        -   Done
      * 
      */
-
+    
+    //  Uncomment if you want to skip this test
+    // if(true){
+    //     return;
+    // }
     console.log("********************** Running Reward Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');
