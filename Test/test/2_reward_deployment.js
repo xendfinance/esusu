@@ -10,13 +10,16 @@
      *  6.  Reward group member with Xend Tokens                -   Done
      *  7.  Reward Esusu member with Xend Tokens                -   Done
      *  8.  Deactivete the reward system                        -   Done
-     * 
+     *  9.  Calculate Category Factor                           -   Done
+     *  10. Calculate RewardFactor For Current ThresholdLevel   -   Done
+     *  11. Get Total Deposits From Existing Xend Finance Services When there is no deposit -   Done
+     *  11b. Get Total Deposits From Existing Xend Finance Services When Some money has been deposited  -  
+     *  12. Get Current ThresholdLevel                          -   Done
+     *  13. Get Current XendTokenRewardThreshold At CurrentLevel    Done
+     *  14. Get RewardTimeLevel                                 -   Done
+     *  15. Calculate PercentageRewardFactor                    -   Done
      */
-    
-    //  Uncomment if you want to skip this test
-    // if(true){
-    //     return;
-    // }
+
     console.log("********************** Running Reward Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');
@@ -334,5 +337,170 @@ const { Contract } = require('web3-eth-contract');
             assert(BigInt(resultEsusu).toString() === "0");
             
         }); 
+
+        it('Reward Config: Should Get RewardTimeLevel', async () => {
+
+            //  NOTE: 2592000 seconds or 30 days is our minimum time level threshhold
+            var totalCycleTime1Day = "86400";                 //  1 day
+            var totalCycleTime30Days = "2592000";            //  30 days
+            var totalCycleTime60Days = "5184000";            //  60 days
+            var totalCycleTime90Days = "7776000";            //  90 days
+            var totalCycleTime120Days = "10368000";           //  120 days
+            var totalCycleTime120Days1Second = "10368001";           //  120 days and 1 second
+
+
+            var result0 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime1Day));
+            var result1 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime30Days));
+            var result2 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime60Days));
+            var result3 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime90Days));
+            var result4 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime120Days));
+            var result5 = BigInt(await rewardConfigContract.GetRewardTimeLevel(totalCycleTime120Days1Second));
+
+            console.log(`Reward Time Level For 1 Days: ${result0.toString()}`);
+
+            console.log(`Reward Time Level For 30 Days: ${result1.toString()}`);
+            console.log(`Reward Time Level For 60 Days: ${result2.toString()}`);
+            console.log(`Reward Time Level For 90 Days: ${result3.toString()}`);
+
+            console.log(`Reward Time Level For 120 Days: ${result4.toString()}`);
+            console.log(`Reward Time Level For 120 Days and 1 Second : ${result5.toString()}`);
+
+            assert(result0.toString() == "0");  //  Any number less than 30 days will result in time level of 0
+            assert(result1.toString() == "1");
+            assert(result2.toString() == "2");
+            assert(result3.toString() == "3");
+            assert(result4.toString() == "4");
+            assert(result5.toString() == "4");  //  Any number greater than than 120 days will still remain at time level of 4
+
+
+        });
+
+        it('Reward Config: Should Calculate Percentage Reward Factor Per Time Level', async() => {
+            var rewardTimeLevel0 = "0";                 //  Member total cycle time is less than minimum number of seconds or threshold of 30 days
+            var rewardTimeLevel1 = "1";
+            var rewardTimeLevel2 = "2";
+            var rewardTimeLevel3 = "3";
+            var rewardTimeLevel4 = "4";
+
+            var result0 = BigInt(await rewardConfigContract.CalculatePercentageRewardFactor(rewardTimeLevel0))
+            var result1 = BigInt(await rewardConfigContract.CalculatePercentageRewardFactor(rewardTimeLevel1))
+            var result2 = BigInt(await rewardConfigContract.CalculatePercentageRewardFactor(rewardTimeLevel2))
+            var result3 = BigInt(await rewardConfigContract.CalculatePercentageRewardFactor(rewardTimeLevel3))
+            var result4 = BigInt(await rewardConfigContract.CalculatePercentageRewardFactor(rewardTimeLevel4))
+
+            /**
+             * NOTE: For example 250000000000000000 is 25%. We can't have 0.25 as BigInt or uint256 so we just leave the value as it is
+             * 500000000000000000 is 50%
+             * 750000000000000000 is 75%
+             * 1000000000000000000 is 100%
+             *  THis means that when the percentage reward is 25% the user will get the 25% of the total reward
+             * */  
+            assert(result0.toString() === "0");
+            assert(result1.toString() === "250000000000000000");
+            assert(result2.toString() === "500000000000000000");
+            assert(result3.toString() === "750000000000000000");
+            assert(result4.toString() === "1000000000000000000");
+
+            console.log(`Reward %age For Time Level 0: ${result0.toString()}`);
+            console.log(`Reward %age For Time Level 1: ${result1.toString()}`);
+            console.log(`Reward %age For Time Level 2: ${result2.toString()}`);
+            console.log(`Reward %age For Time Level 3: ${result3.toString()}`);
+            console.log(`Reward %age For Time Level 4: ${result4.toString()}`);
+
+        });
+        it('Reward Config: Should Get Current Threshold Level', async() => {
+
+            var result0 = BigInt(await rewardConfigContract.GetCurrentThresholdLevel())
+            
+            //  Current threshold level will always be equal to 1 in this test since the deposit is not up to $100,000,000
+            assert(result0.toString() === "1");
+
+            console.log(`Current Threshold Level: ${result0.toString()}`);
+
+        });
+ 
+
+        /**
+         *  Equation: CurrentXendTokenRewardAtCurrentLevel = XendTokenRewardAtInitialThreshold.div(DepreciationFactor ** level.sub(1));
+         * =>   10,000,000 / 2^(Current level - 1) -> This is from the Litepaper
+         */
+        it('Reward Config: Should Get Current Xend Token Reward At Current Level', async() => {
+
+            //  Assumptions are based on the Litepaper
+            //  Current threshold level will always be equal to 1 in this test since the deposit is not up to $100,000,000
+            //  Current Xend Token Reward At Current Threshold Level of 1 will always be 10,000,000 Xend Tokens
+
+            var result0 = BigInt(await rewardConfigContract.GetCurrentThresholdLevel());
+
+            assert(result0.toString() === "1");
+
+            var result1 = BigInt(await rewardConfigContract.GetCurrentXendTokenRewardThresholdAtCurrentLevel())
+            
+            assert(result1.toString() === "10000000000000000000000000");
+
+            console.log(`Current Threshold Level: ${result1.toString()}`);
+
+        });
+  
+        it('Reward Config: Should Get Total Deposits From All Xend Finance Services', async() => {
+
+            //  NOTE: Total Deposits will always be zero if Individual, group or Esusu operations have not occured.
+            var result0 = BigInt(await rewardConfigContract.GetTotalDeposits());
+
+            assert(result0.toString() === "0");
+            
+            console.log(`Total Deposits: ${result0.toString()}`);
+
+        });
+
+        /**
+         * From the Litepaper
+         * Reward factor for current threshold level (XTf) => Xend Token Threshold Per Level / Deposit Threshold for that level in USD
+         * Using our initial values as example, Reward Factor At Current Threshold Level (XTf) = 10,000,000 XT/ $100,000,000
+         * NOTE: Since we are dealing with BigInt, we will multiply 10,000,000 by 1 * 10^18 so we will not have a decimal result
+         * This makes the value to be 100000000000000000 which is 0.1 in decimal at initial values of 10m XT and $100m
+         */
+        it('Reward Config: Should Calculate Reward Factor For Current Threshold Level', async() => {
+                        
+            var result0 = BigInt(await rewardConfigContract.CalculateRewardFactorForCurrentThresholdLevel());
+
+            assert(result0.toString() === "100000000000000000");
+            
+            console.log(`Reward Factor At Initial values: ${result0.toString()}`);
+
+        });
+    
+        /**
+         * Category Reward Factor is determined by the totalCycleTime and the Reward Factor for 
+         * that particular operation(eg 0.7 reward factor is for individual saving category, 
+         * 1.0 reward factor is for group saving category and 1.5 reward factor is for esusu category)
+         * 
+         * 
+         */
+        it('Reward Config: Should Calculate Category Reward Factor', async() => {
+                        
+            var totalCycleTime30Days = "2592000";               //  30 days -> This means our overall category reward factor will be multiplied by 25% or 1/4
+            var individualRewardFactor = "7";                   //  0.7 * 10 -> We need to take care of the decimal
+            var groupRewardFactor      = "10";                  //  1.0 * 10
+            var esusuRewardFactor      = "15";                  //  1.5 * 10
+
+            //  IndividualAt25Percent -> 0.25 * 0.7 = 0.175
+            var resultIndividualAt25PercentageReward = BigInt(await rewardConfigContract.CalculateCategoryFactor(totalCycleTime30Days,individualRewardFactor));
+
+            //  GroupAt25Percent -> 0.25 * 1.0 = 0.25
+            var resultGroupAt25PercentageReward = BigInt(await rewardConfigContract.CalculateCategoryFactor(totalCycleTime30Days,groupRewardFactor));
+
+            //  EsusuAt25Percent -> 0.25 * 1.5 = 0.375
+            var resultEsusuAt25PercentageReward = BigInt(await rewardConfigContract.CalculateCategoryFactor(totalCycleTime30Days,esusuRewardFactor));
+
+            assert(resultIndividualAt25PercentageReward.toString() === "175000000000000000");
+            assert(resultGroupAt25PercentageReward.toString() === "250000000000000000");
+            assert(resultEsusuAt25PercentageReward.toString() === "375000000000000000");
+
+            console.log(`Individual Reward Factor At 25%: ${resultIndividualAt25PercentageReward.toString()}`);
+            console.log(`Group Reward Factor At 25%: ${resultGroupAt25PercentageReward.toString()}`);
+            console.log(`Esusu Reward Factor At 25%: ${resultEsusuAt25PercentageReward.toString()}`);
+
+        });      
 
     });
