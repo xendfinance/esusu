@@ -224,16 +224,13 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         //  If cycle ID is valid, else bonunce
         require(esusuCycleId > 0 && esusuCycleId <= currentEsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
-        // TODO: remove this line EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
-        
+
         require(CycleState == uint(CycleStateEnum.Idle), "Cycle can only be started when in Idle state");
         
         require(now > _esusuStorage.GetEsusuCycleStartTime(esusuCycleId), "Cycle can only be started when start time has elapsed");
         
-        // TODO: remove EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum.Active;
-        
+
         //  Calculate Cycle LifeTime in seconds
-        // TODO: remove this line EsusuCycleMapping[esusuCycleId].TotalCycleDuration = cycle.PayoutIntervalSeconds * cycle.TotalMembers;
         uint toalCycleDuration = EsusuCyclePayoutInterval * TotalMembers;
 
         
@@ -258,15 +255,10 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         
         
         //  Save yDai Total balanceShares
-        // TODO: remove this line EsusuCycleMapping[esusuCycleId].TotalShares = yDaiSharesForContractAfterSave.sub(yDaiSharesForContractBeforeSave).add(EsusuCycleMapping[esusuCycleId].TotalShares);
         uint totalShares = yDaiSharesForContractAfterSave.sub(yDaiSharesForContractBeforeSave).add(EsusuCycleTotalShares);
         
-        //  Update the Cycle start time to now
-        // TODO: remove this line: EsusuCycleMapping[esusuCycleId].CycleStartTime = now;
-        
         //  Increase TotalDeposits made to this contract 
-        // TODO remove this line: TotalDeposits = TotalDeposits.add(esusuCycleBalance);
-        
+
         _esusuStorage.IncreaseTotalDeposits(esusuCycleBalance);
         
         //  Update Esusu Cycle State, total cycle duration, total shares  and  cycle start time, 
@@ -297,7 +289,6 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     
 
     
-    // /* Test helper functions starts  TODO: remove later */
     function GetDaiBalance(address member) active external view returns(uint){
         return _dai.balanceOf(member);
     }
@@ -307,46 +298,15 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     }
     
     
-    // function CalculateMemberWithdrawalTime(uint esusuCycleId, address member) internal view returns(uint){
-        
-    //     EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-
-    //     mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[cycle.CycleId];
-        
-    //     uint memberPosition = memberPositionMapping[member];
-        
-    //     uint withdrawalTime = (cycle.CycleStartTime.add(memberPosition.mul(cycle.PayoutIntervalSeconds)));
-        
-    //     return withdrawalTime;
-    // }
     
     function GetTotalDeposits() active public view returns(uint)  {
-        //  TODO: remove this line: return TotalDeposits;
         return _esusuStorage.GetTotalDeposits();
     } 
     
-    // /*  Test helper functions ends TODO: remove later */
-
-    /*
-        This function returns the Withdrawal time for a member in seconds
-        
-        Parameters
-        - Wt    -> Withdrawal Time for a member 
-        - To    -> Cycle Start Time
-        - Mpos  -> Member Position in the Cycle 
-        - Ct     -> Cycle Time Interval in seconds
-        
-        Equation
-        Wt = (To + (Mpos * Ct))
-    */
-    
-    //  TODO: remove this line: function _calculateMemberWithdrawalTime(EsusuCycle memory cycle, address member) internal view returns(uint){
     
 
     
     function GetCurrentEsusuCycleId() active public view returns(uint){
-        
-        // TODO: remove this line: EsusuCycle memory cycle = EsusuCycleMapping[EsusuCycleId];
         
         return _esusuStorage.GetEsusuCycleId();
     }
@@ -357,12 +317,6 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     }
     
     function _isMemberABeneficiaryInCycle(address memberAddress,uint esusuCycleId ) internal view returns(bool){
-        
-        //  TODO: start remove code
-        // mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[esusuCycleId];
-        
-        // uint amount = beneficiaryMapping[memberAddress];
-        //  TODO: stop remove code
 
         uint amount = _esusuStorage.GetMemberCycleToBeneficiaryMapping(esusuCycleId, memberAddress);
 
@@ -377,13 +331,6 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     }
     
     function _isMemberInWithdrawnCapitalMapping(address memberAddress,uint esusuCycleId ) internal view returns(bool){
-        
-        //  TODO: start remove code  
-        // mapping(address=>uint) storage memberWithdrawnCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];
-        
-        // uint amount = memberWithdrawnCapitalMapping[memberAddress];
-        
-        //  TODO: stop remove code
         
         uint amount = _esusuStorage.GetMemberWithdrawnCapitalInEsusuCycle(esusuCycleId, memberAddress);
         //  If member has withdrawn capital from this cycle, the amount recieved should be greater than 0

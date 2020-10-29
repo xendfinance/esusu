@@ -98,25 +98,15 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         */
         
         function WithdrawCapitalFromEsusuCycle(uint esusuCycleId, address member) public active onlyOwnerAndServiceContract {
-        //  TODO: get basic esusu information : cycle state, deposit amount, total shares, total cycle duration, total members, total beneficiaries
-        //  TODO: update esusu information: total cycle shares , total capital withdrawn, cycle state 
-        //  TODO: create member capital mapping 
-        
+
         //  Get Esusu Cycle Basic information
         (uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers) = _esusuStorage.GetEsusuCycleBasicInformation(esusuCycleId);
         
         require(_isMemberEligibleToWithdrawCapital(esusuCycleId,member));
         
         //  Add member to capital withdrawn mapping
-        
-        // TODO: remove line: mapping(address=>uint) storage memberCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];
-        
-        // TODO: remove line EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
-
-        // TODO: remove line uint memberDeposit = cycle.DepositAmount;
 
         //  Get the current yDaiSharesPerCycle and call the WithdrawByShares function on the daiLending Service
-        //  TODO: remove line: uint yDaiSharesPerCycle = cycle.TotalShares;
         uint yDaiSharesPerCycle = _esusuStorage.GetEsusuCycleTotalShares(esusuCycleId);
 
 
@@ -137,7 +127,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         _dai.transfer(member, DepositAmount);
         
         //  Reward member with Xend Tokens
-        // TODO: remove line _rewardMember(cycle.TotalCycleDuration,member,DepositAmount);
         _rewardMember(_esusuStorage.GetEsusuCycleDuration(esusuCycleId),member,DepositAmount);
         
         //  Get the yDaiSharesForContractAfterWithdrawal 
@@ -146,32 +135,25 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         require(yDaiSharesForContractBeforeWithdrawal > yDaiSharesForContractAfterWithdrawal, "yDai shares before withdrawal must be greater !!!");
         
         //  Update the total balanceShares for this cycle 
-        // TODO: remove this line cycle.TotalShares = yDaiSharesPerCycle.sub(yDaiSharesForContractBeforeWithdrawal.sub(yDaiSharesForContractAfterWithdrawal));
         uint cycleTotalShares = yDaiSharesPerCycle.sub(yDaiSharesForContractBeforeWithdrawal.sub(yDaiSharesForContractAfterWithdrawal));
         
         //  Add this member to the CycleToMemberWithdrawnCapitalMapping
-        // TODO: remove this line memberCapitalMapping[member] = memberDeposit;
-        
+
         //  Create Member Capital Mapping
         _esusuStorage.CreateMemberCapitalMapping(esusuCycleId,member);
         
         //  Increase total capital withdrawn 
-        //  TODO: remove line cycle.TotalCapitalWithdrawn = cycle.TotalCapitalWithdrawn.add(memberDeposit);
         uint TotalCapitalWithdrawnInCycle = _esusuStorage.GetEsusuCycleTotalCapitalWithdrawn(CycleId).add(DepositAmount);
         
         //   Check if TotalCapitalWithdrawn == TotalAmountDeposited && if TotalMembers == TotalBeneficiaries, if yes, set the Cycle to Inactive
         
-        //  TODO: remove line: if(cycle.TotalCapitalWithdrawn == cycle.TotalAmountDeposited && cycle.TotalMembers == cycle.TotalBeneficiaries){
         if(TotalCapitalWithdrawnInCycle == _esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId) && TotalMembers == _esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId)){
     
-            // TODO: remove this line: EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum.Inactive;
             _esusuStorage.UpdateEsusuCycleState(esusuCycleId, uint(CycleStateEnum.Inactive));
             
             //  Since this cycle is inactive, send whatever Total shares Dai equivalent that is left to our treasury contract
 
             //  Withdraw DAI equivalent fof TotalShares
-            //  TODO: remove this line: _yDai.approve(daiLendingAdapterContractAddress,cycle.TotalShares);
-            //  TODO: remove this line: _iDaiLendingService.WithdrawBySharesOnly(cycle.TotalShares);
         
             _yDai.approve(daiLendingAdapterContractAddress,cycleTotalShares);
             _iDaiLendingService.WithdrawBySharesOnly(cycleTotalShares);
@@ -194,7 +176,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         _esusuStorage.UpdateEsusuCycleDuringCapitalWithdrawal(CycleId, cycleTotalShares,TotalCapitalWithdrawnInCycle);
 
         //  emit event
-        //  TODO: remove this line : emit CapitalWithdrawalEvent(now, member, esusuCycleId,memberDeposit);
         emit CapitalWithdrawalEvent(now, member, esusuCycleId,DepositAmount);
 
     }
@@ -236,17 +217,11 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
     */
     
     function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member)  public active onlyOwnerAndServiceContract {
-        //  TODO: get basic esusu information : cycle state, deposit amount, total shares, payout intervals, total cycle duration, total members, total beneficiaries
-        //  TODO: update esusu information: total cycle shares , cycle state, total beneficiaries 
-        //  TODO: create member capital mapping 
         
         bool isMemberEligibleToWithdraw = _isMemberEligibleToWithdrawROI(esusuCycleId,member);
         
         require(isMemberEligibleToWithdraw, "Member cannot withdraw at this time");
         
-        //  TODO: remove this line: EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
-
-        //  TODO: remove this line: uint currentBalanceShares = cycle.TotalShares;
         uint currentBalanceShares = _esusuStorage.GetEsusuCycleTotalShares(esusuCycleId);
         
         uint pricePerFullShare = _iDaiLendingService.getPricePerFullShare();
@@ -257,17 +232,14 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         // address memberAddress = member;
         
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
-        //  TODO: remove this line: uint Bt = cycle.PayoutIntervalSeconds.mul(cycle.TotalBeneficiaries);
         uint Bt = _esusuStorage.GetEsusuCyclePayoutInterval(esusuCycleId).mul(_esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId));
 
         uint Ta = now.sub(Bt);
-        //  TODO: remove this line: uint Troi = overallGrossDaiBalance.sub(cycle.TotalAmountDeposited.sub(cycle.TotalCapitalWithdrawn));
         uint Troi = overallGrossDaiBalance.sub(_esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId).sub(_esusuStorage.GetEsusuCycleTotalCapitalWithdrawn(esusuCycleId)));
 
         uint Mroi = Troi.div(Ta);
         
         //  Get the current yDaiSharesPerCycle and call the WithdrawByShares function on the daiLending Service
-        //  TODO: remove this line: uint yDaiSharesPerCycle = cycle.TotalShares;
         // uint yDaiSharesPerCycle = currentBalanceShares;
         
         //  transfer yDaiShares from the adapter contract to here 
@@ -285,7 +257,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         
         
         //  Now the Dai is in this contract, transfer the net ROI to the member and fee to treasury contract 
-        //  TODO: remove this line: sendROI(Mroi,member,cycle);
         sendROI(Mroi,member,CycleId);
         
         
@@ -307,10 +278,8 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
             - If cycle has expired then we move the left over yDai to treasury
         */
         
-        //  TODO: remove this line if(now > cycle.TotalCycleDuration){
         if(now > _esusuStorage.GetEsusuCycleDuration(CycleId)){
             
-            //  TODO: remove this line: cycle.CycleState = CycleStateEnum.Expired;
             _esusuStorage.UpdateEsusuCycleState(CycleId, uint(CycleStateEnum.Expired));
         }
         
@@ -324,7 +293,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         _emitROIWithdrawalEvent(member,Mroi,CycleId);
     }
     
-                /*
+    /*
         This gets the fee percentage from the fee contract, deducts the fee and sends to treasury contract 
         
         For now let us assume fee percentage is 0.1% 
@@ -333,7 +302,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         - Send the fee to the treasury
         - Add member to beneficiary mapping
     */
-    //  TODO: remove this line: function sendROI(uint Mroi, address memberAddress, EsusuCycle storage cycle) internal{
     function sendROI(uint Mroi, address memberAddress, uint esusuCycleId) internal{       
         //  get feeRate from fee contract
 
@@ -346,13 +314,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         uint memberROINet = Mroi.sub(fee); 
         
          //  Add member to beneficiary mapping
-        
-        //  TODO: start remove code below
-        // mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[esusuCycleId];
-        
-        // beneficiaryMapping[memberAddress] = memberROINet;
-        
-        //  TODO: end remove code above
         
         _esusuStorage.CreateEsusuCycleToBeneficiaryMapping(esusuCycleId,memberAddress,memberROINet);
         
@@ -400,18 +361,15 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         
         require(esusuCycleId > 0 && esusuCycleId <= currentEsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
-        //  TODO: remove this line: EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         uint cycleState = _esusuStorage.GetEsusuCycleState(esusuCycleId);
         
-        //  TODO: remove this line: require(cycle.CycleState == CycleStateEnum.Active || cycle.CycleState == CycleStateEnum.Expired, "Cycle must be in active or expired state");
-     
+
         require(cycleState == uint(CycleStateEnum.Active) || cycleState == uint(CycleStateEnum.Expired), "Cycle must be in active or expired state");   
         
         require(_isMemberInCycle(member,esusuCycleId), "Member is not in this cycle");
         
         require(_isMemberABeneficiaryInCycle(member,esusuCycleId) == false, "Member is already a beneficiary");
         
-        //  TODO: remove this line : uint memberWithdrawalTime = _calculateMemberWithdrawalTime(cycle,member);
         uint memberWithdrawalTime = _calculateMemberWithdrawalTime(esusuCycleId,member); 
         
         if(now > memberWithdrawalTime){
@@ -430,10 +388,8 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         
         require(esusuCycleId > 0 && esusuCycleId <= currentEsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
-        //  TODO: remove this line: EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
         uint cycleState = _esusuStorage.GetEsusuCycleState(esusuCycleId);
         
-        //  TODO: remove this line require(cycle.CycleState == CycleStateEnum.Expired, "Cycle must be in Expired state for you to withdraw capital");
         require(cycleState == uint(CycleStateEnum.Expired), "Cycle must be in Expired state for you to withdraw capital");
         
         require(_isMemberInCycle(member,esusuCycleId), "Member is not in this cycle");
@@ -453,12 +409,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
     
     function _isMemberABeneficiaryInCycle(address memberAddress,uint esusuCycleId ) internal view returns(bool){
         
-        //  TODO: start remove code
-        // mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[esusuCycleId];
-        
-        // uint amount = beneficiaryMapping[memberAddress];
-        //  TODO: stop remove code
-
         uint amount = _esusuStorage.GetMemberCycleToBeneficiaryMapping(esusuCycleId, memberAddress);
 
         //  If member has received money from this cycle, the amount recieved should be greater than 0
@@ -472,13 +422,6 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
     }
     
     function _isMemberInWithdrawnCapitalMapping(address memberAddress,uint esusuCycleId ) internal view returns(bool){
-        
-        //  TODO: start remove code  
-        // mapping(address=>uint) storage memberWithdrawnCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];
-        
-        // uint amount = memberWithdrawnCapitalMapping[memberAddress];
-        
-        //  TODO: stop remove code
         
         uint amount = _esusuStorage.GetMemberWithdrawnCapitalInEsusuCycle(esusuCycleId, memberAddress);
         //  If member has withdrawn capital from this cycle, the amount recieved should be greater than 0
