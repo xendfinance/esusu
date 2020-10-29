@@ -9,6 +9,8 @@ const XendTokenContract = artifacts.require('XendToken');
 const EsusuServiceContract = artifacts.require('EsusuService');
 const RewardConfigContract = artifacts.require('RewardConfig');
 const EsusuAdapterContract = artifacts.require('EsusuAdapter');
+const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWithdrawalDelegate');
+const EsusuStorageContract = artifacts.require('EsusuStorage');
 
 module.exports = function (deployer) {
   
@@ -32,16 +34,28 @@ module.exports = function (deployer) {
      await deployer.deploy(EsusuServiceContract);
     
      await deployer.deploy(RewardConfigContract,EsusuServiceContract.address, GroupsContract.address);
+    
+     await deployer.deploy(EsusuStorageContract);
+
+    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract, 
+    //                 string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract
 
      await deployer.deploy(EsusuAdapterContract,
                             EsusuServiceContract.address,
-                            TreasuryContract.address,
                             SavingsConfigContract.address,
-                            "esusufee",
                             GroupsContract.address,
-                            RewardConfigContract.address,
-                            XendTokenContract.address);
+                            EsusuStorageContract.address);
 
+      await deployer.deploy(EsusuAdapterWithdrawalDelegateContract,
+                              EsusuServiceContract.address, 
+                              EsusuStorageContract.address,
+                              EsusuAdapterContract.address,
+                              "esusufee",
+                              TreasuryContract.address,
+                              RewardConfigContract.address,
+                              XendTokenContract.address,
+                              SavingsConfigContract.address);
+                              
      console.log("Groups Contract address: "+GroupsContract.address);
 
      console.log("Treasury Contract address: "+TreasuryContract.address);
@@ -55,6 +69,10 @@ module.exports = function (deployer) {
      console.log("XendToken Contract address: "+XendTokenContract.address );
 
      console.log("EsusuService Contract address: "+EsusuServiceContract.address );
+
+     console.log("EsusuStorage Contract address: "+EsusuStorageContract.address );
+
+     console.log("EsusuAdapterWithdrawalDelegate Contract address: "+EsusuAdapterWithdrawalDelegateContract.address );
 
      console.log("RewardConfig Contract address: "+RewardConfigContract.address );
 

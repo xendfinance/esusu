@@ -1,4 +1,3 @@
-  
     /**
      *  @todo    
      *  Ensure to install web3 before running this test -> npm install web3
@@ -18,9 +17,9 @@
      *  13. Start the Esusu Cycle with 3 accounts   -   Done
      *  14. Withdraw ROI for 3 accounts             -   Done
      *  15. Withraw Capital for 3 accounts          -   Done
+     *  16. Test contract deprication               -   Done
      */
 
-    //  Uncomment if you want to skip this test
     // if(true){
     //     return;
     // }
@@ -38,7 +37,8 @@
     const EsusuServiceContract = artifacts.require('EsusuService');
     const RewardConfigContract = artifacts.require('RewardConfig');
     const EsusuAdapterContract = artifacts.require('EsusuAdapter'); 
-
+    const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWithdrawalDelegate');
+    const EsusuStorageContract = artifacts.require('EsusuStorage');
     /** External contracts definition for DAI and YDAI
      *  1. I have unlocked an address from Ganache-cli that contains a lot of dai
      *  2. We will use the DAI contract to enable transfer and also balance checking of the generated accounts
@@ -97,7 +97,7 @@
     
     };
     
-    
+
     contract('EsusuService', () => {
         let daiLendingAdapterContract = null;
         let daiLendingServiceContract = null;
@@ -106,6 +106,9 @@
         let esusuServiceContract = null;
         let groupsContract = null;
         let xendTokenContract = null;
+        let esusuAdapterWithdrawalDelegateContract = null;
+        let esusuStorageContract = null;
+
         before(async () =>{
 
             savingsConfigContract = await SavingsConfigContract.deployed();
@@ -115,6 +118,8 @@
             esusuServiceContract = await EsusuServiceContract.deployed();
             groupsContract = await GroupsContract.deployed();
             xendTokenContract = await XendTokenContract.deployed();
+            esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
+            esusuStorageContract = await EsusuStorageContract.deployed();
 
             //1. Create SavingsConfig rules
             await savingsConfigContract.createRule("esusufee","","","1000","1");
@@ -139,8 +144,29 @@
 
             //6. Xend Token Should Grant access to the  Esusu Adapter Contract
             await xendTokenContract.grantAccess(esusuAdapterContract.address);
-            console.log("6->EsusuAdapter Address Given access In Xend Token contract to transfer tokens ...");
-          
+            console.log("6->Xend Token Has Given access To Esusu Adapter to transfer tokens ...");
+            
+            //7. Esusu Adapter should Update Esusu Adapter Withdrawal Delegate
+            await esusuAdapterContract.UpdateEsusuAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("7->EsusuAdapter Has Updated Esusu Adapter Withdrawal Delegate Address ...");
+
+            //8. Esusu Adapter Withdrawal Delegate should Update Dai Lending Service
+            await esusuAdapterWithdrawalDelegateContract.UpdateDaiLendingService(daiLendingServiceContract.address);
+            console.log("8->Esusu Adapter Withdrawal Delegate Has Updated Dai Lending Service ...");
+
+            //9. Esusu Service should update esusu adapter withdrawal delegate
+            await esusuServiceContract.UpdateAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("9->Esusu Service Contract Has Updated  Esusu Adapter Withdrawal Delegate Address ...");
+
+            //10. Esusu Storage should Update Adapter and Adapter Withdrawal Delegate 
+            await esusuStorageContract.UpdateAdapterAndAdapterDelegateAddresses(esusuAdapterContract.address,esusuAdapterWithdrawalDelegateContract.address);
+            console.log("10->Esusu Storage Contract Has Updated  Esusu Adapter and Esusu Adapter Withdrawal Delegate Address ...");
+            
+            //11. Xend Token Should Grant access to the  Esusu Adapter Withdrawal Delegate Contract
+            await xendTokenContract.grantAccess(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("11->Xend Token Has Given access To Esusu Adapter Withdrawal Delegate to transfer tokens ...");
+
+
             //  Get the addresses and Balances of at least 2 accounts to be used in the test
             //  Send DAI to the addresses
             web3.eth.getAccounts().then(function(accounts){
@@ -190,12 +216,12 @@
     
     
         });
-    
+   
         var groupName = "Omega Reality";
         var groupSymbol = "Ω";
         var groupId = null;
         var depositAmount = "2000000000000000000000";   //2,000 DAI 10000000000000000000000 
-        var payoutIntervalSeconds = "120";  // 2 minutes
+        var payoutIntervalSeconds = "30";  // 2 minutes
         var startTimeInSeconds = Math.floor((Date.now() + 120)/1000); // starts 2 minutes afer current time
         var maxMembers = "2";
         var currentEsusuCycleId = null;
@@ -244,7 +270,7 @@
             var approvedAmountToSpend = BigInt(10000000000000000000000); //   10,000 Dai
             approveDai(esusuAdapterContract.address,account1,approvedAmountToSpend);
             approveDai(esusuAdapterContract.address,account2,approvedAmountToSpend);
-
+            
             //  Account 1 and 2 should Join esusu cycle
             await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account1);
             await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account2);
@@ -367,6 +393,9 @@
             //  Withdraw overall ROI 
             await esusuServiceContract.WithdrawROIFromEsusuCycle(currentEsusuCycleId.toString());
 
+            console.log(`YDAI Balance of Esusu Adapter Withdrawal Delegate: ${await yDaiContract.methods.balanceOf(esusuAdapterWithdrawalDelegateContract.address).call()}`);
+            console.log(`DAI Balance of Esusu Adapter Withdrawal Delegate: ${await daiContract.methods.balanceOf(esusuAdapterWithdrawalDelegateContract.address).call()}`);
+
             console.log(`Withdrawing...`);
 
             var DaiBalanceAfterWithdrawing = BigInt(await daiLendingAdapterContract.GetDaiBalance(account1));
@@ -379,6 +408,8 @@
             result = await esusuServiceContract.GetEsusuCycle(currentEsusuCycleId.toString());
             var totalBeneficiaries = BigInt(result[10]);
             
+            //  TODO: get the treasury balance and ensure dai balance is greater than 0
+
             assert(DaiBalanceAfterWithdrawing > DaiBalanceBeforeWithdrawing);  
             assert(totalBeneficiaries > 0);   //    Total Beneficiaries must be greater than 0   
             assert(currentEsusuCycleId.toString() === BigInt(result[0]).toString());
@@ -436,6 +467,7 @@
             result = await esusuServiceContract.GetEsusuCycle(currentEsusuCycleId.toString());
             var totalBeneficiaries = BigInt(result[10]);
             var TotalCapitalWithdrawn = BigInt(result[8]);
+
 
             assert(DaiBalanceAfterWithdrawing > DaiBalanceBeforeWithdrawing);  
             assert(totalBeneficiaries > 0);     //  Total Beneficiaries must be greater than 0   
@@ -738,5 +770,28 @@
             }
               
         });
+
+        //  Should depricate contract
+        it('EsusuAdapter Contract: Should Depricate Contract', async () => {
+
+            let adapterYDaiBalanceBeforeDeprication = await yDaiContract.methods.balanceOf(esusuAdapterContract.address).call();
+
+            console.log(`YDai Shares Balance Before Deprication: ${adapterYDaiBalanceBeforeDeprication}`);
+
+            await esusuAdapterContract.DepricateContract(esusuServiceContract.address, "the liquid metal");
+
+            let adapterYDaiBalanceAfterDeprication = await yDaiContract.methods.balanceOf(esusuAdapterContract.address).call();
+
+            console.log(`YDai Shares Balance After Deprication: ${adapterYDaiBalanceAfterDeprication}`);
+
+            
+            //  The code below should fail
+            
+            var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
+
+            console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+
+        });
+
     });
     
