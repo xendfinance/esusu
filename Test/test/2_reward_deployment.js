@@ -19,7 +19,10 @@
      *  14. Get RewardTimeLevel                                 -   Done
      *  15. Calculate PercentageRewardFactor                    -   Done
      */
-
+    
+    // if(true){
+    //     return;
+    // }
     console.log("********************** Running Reward Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');
@@ -34,6 +37,8 @@
     const EsusuServiceContract = artifacts.require('EsusuService');
     const RewardConfigContract = artifacts.require('RewardConfig');
     const EsusuAdapterContract = artifacts.require('EsusuAdapter'); 
+    const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWithdrawalDelegate');
+    const EsusuStorageContract = artifacts.require('EsusuStorage');
 
     /** External contracts definition for DAI and YDAI
      *  1. I have unlocked an address from Ganache-cli that contains a lot of dai
@@ -104,6 +109,8 @@ const { Contract } = require('web3-eth-contract');
         let esusuServiceContract = null;
         let groupsContract = null;
         let xendTokenContract = null;
+        let esusuAdapterWithdrawalDelegateContract = null;
+        let esusuStorageContract = null;
         let rewardConfigContract = null;
 
         before(async () =>{
@@ -115,6 +122,8 @@ const { Contract } = require('web3-eth-contract');
             esusuServiceContract = await EsusuServiceContract.deployed();
             groupsContract = await GroupsContract.deployed();
             xendTokenContract = await XendTokenContract.deployed();
+            esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
+            esusuStorageContract = await EsusuStorageContract.deployed();
             rewardConfigContract = await RewardConfigContract.deployed();
 
             //1. Create SavingsConfig rules
@@ -138,11 +147,29 @@ const { Contract } = require('web3-eth-contract');
             await  groupsContract.activateStorageOracle(esusuAdapterContract.address);
             console.log("5->EsusuAdapter Address Updated In Groups contract ...");
 
-            //6. Xend Token Should Grant access to the  Esusu Adapter Contract and the 3 accounts
+            //6. Xend Token Should Grant access to the  Esusu Adapter Contract
             await xendTokenContract.grantAccess(esusuAdapterContract.address);
+            console.log("6->Xend Token Has Given access To Esusu Adapter to transfer tokens ...");
+            
+            //7. Esusu Adapter should Update Esusu Adapter Withdrawal Delegate
+            await esusuAdapterContract.UpdateEsusuAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("7->EsusuAdapter Has Updated Esusu Adapter Withdrawal Delegate Address ...");
 
+            //8. Esusu Adapter Withdrawal Delegate should Update Dai Lending Service
+            await esusuAdapterWithdrawalDelegateContract.UpdateDaiLendingService(daiLendingServiceContract.address);
+            console.log("8->Esusu Adapter Withdrawal Delegate Has Updated Dai Lending Service ...");
 
-            console.log("6->EsusuAdapter Address Given access In Xend Token contract to transfer tokens ...");
+            //9. Esusu Service should update esusu adapter withdrawal delegate
+            await esusuServiceContract.UpdateAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("9->Esusu Service Contract Has Updated  Esusu Adapter Withdrawal Delegate Address ...");
+
+            //10. Esusu Storage should Update Adapter and Adapter Withdrawal Delegate 
+            await esusuStorageContract.UpdateAdapterAndAdapterDelegateAddresses(esusuAdapterContract.address,esusuAdapterWithdrawalDelegateContract.address);
+            console.log("10->Esusu Storage Contract Has Updated  Esusu Adapter and Esusu Adapter Withdrawal Delegate Address ...");
+            
+            //11. Xend Token Should Grant access to the  Esusu Adapter Withdrawal Delegate Contract
+            await xendTokenContract.grantAccess(esusuAdapterWithdrawalDelegateContract.address);
+            console.log("11->Xend Token Has Given access To Esusu Adapter Withdrawal Delegate to transfer tokens ...");
           
             //  Get the addresses and Balances of at least 2 accounts to be used in the test
             //  Send DAI to the addresses
