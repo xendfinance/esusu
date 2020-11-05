@@ -1,16 +1,16 @@
-pragma solidity ^0.6.6;
+pragma solidity >=0.6.6;
 
-import "./IDaiToken.sol";
-import "./IYDaiToken.sol";
+import "../interfaces/IDaiToken.sol";
+import "../interfaces/IYDaiToken.sol";
 
-import "./IDaiLendingService.sol";
+import "../interfaces/IDaiLendingService.sol";
 import "./OwnableService.sol";
 
-import "./ISavingsConfig.sol";
-import "./ISavingsConfigSchema.sol";
-import "./IGroups.sol";
+import "../interfaces/ISavingsConfig.sol";
+import "../interfaces/ISavingsConfigSchema.sol";
+import "../interfaces/IGroups.sol";
 import "./SafeMath.sol";
-import "./IEsusuStorage.sol";
+import "../interfaces/IEsusuStorage.sol";
 
 
 contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
@@ -412,4 +412,3 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     
 
 }
-
