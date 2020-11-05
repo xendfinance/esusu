@@ -17,4 +17,5 @@ contract("EsusuAdapter", (accounts) => {
 
         console.log(result)
     })
+
 })
