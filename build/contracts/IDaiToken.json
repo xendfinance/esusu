@@ -197,14 +197,14 @@
     "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IDaiToken.sol",
     "exportedSymbols": {
       "IDaiToken": [
-        4018
+        5331
       ]
     },
-    "id": 4019,
+    "id": 5332,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4014,
+        "id": 5327,
         "literals": [
           "solidity",
           "^",
@@ -212,16 +212,16 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:6"
+        "src": "0:23:8"
       },
       {
         "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IERC20.sol",
         "file": "./IERC20.sol",
-        "id": 4015,
+        "id": 5328,
         "nodeType": "ImportDirective",
-        "scope": 4019,
-        "sourceUnit": 4097,
-        "src": "25:22:6",
+        "scope": 5332,
+        "sourceUnit": 5410,
+        "src": "25:22:8",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -232,53 +232,53 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 4016,
+              "id": 5329,
               "name": "IERC20",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4096,
-              "src": "154:6:6",
+              "referencedDeclaration": 5409,
+              "src": "154:6:8",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IERC20_$4096",
+                "typeIdentifier": "t_contract$_IERC20_$5409",
                 "typeString": "contract IERC20"
               }
             },
-            "id": 4017,
+            "id": 5330,
             "nodeType": "InheritanceSpecifier",
-            "src": "154:6:6"
+            "src": "154:6:8"
           }
         ],
         "contractDependencies": [
-          4096
+          5409
         ],
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 4018,
+        "id": 5331,
         "linearizedBaseContracts": [
-          4018,
-          4096
+          5331,
+          5409
         ],
         "name": "IDaiToken",
         "nodeType": "ContractDefinition",
         "nodes": [],
-        "scope": 4019,
-        "src": "131:42:6"
+        "scope": 5332,
+        "src": "131:42:8"
       }
     ],
-    "src": "0:173:6"
+    "src": "0:173:8"
   },
   "legacyAST": {
     "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IDaiToken.sol",
     "exportedSymbols": {
       "IDaiToken": [
-        4018
+        5331
       ]
     },
-    "id": 4019,
+    "id": 5332,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 4014,
+        "id": 5327,
         "literals": [
           "solidity",
           "^",
@@ -286,16 +286,16 @@
           ".6"
         ],
         "nodeType": "PragmaDirective",
-        "src": "0:23:6"
+        "src": "0:23:8"
       },
       {
         "absolutePath": "/Users/njokuscript/Desktop/programming/esusu/contracts/IERC20.sol",
         "file": "./IERC20.sol",
-        "id": 4015,
+        "id": 5328,
         "nodeType": "ImportDirective",
-        "scope": 4019,
-        "sourceUnit": 4097,
-        "src": "25:22:6",
+        "scope": 5332,
+        "sourceUnit": 5410,
+        "src": "25:22:8",
         "symbolAliases": [],
         "unitAlias": ""
       },
@@ -306,40 +306,40 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 4016,
+              "id": 5329,
               "name": "IERC20",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 4096,
-              "src": "154:6:6",
+              "referencedDeclaration": 5409,
+              "src": "154:6:8",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_IERC20_$4096",
+                "typeIdentifier": "t_contract$_IERC20_$5409",
                 "typeString": "contract IERC20"
               }
             },
-            "id": 4017,
+            "id": 5330,
             "nodeType": "InheritanceSpecifier",
-            "src": "154:6:6"
+            "src": "154:6:8"
           }
         ],
         "contractDependencies": [
-          4096
+          5409
         ],
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 4018,
+        "id": 5331,
         "linearizedBaseContracts": [
-          4018,
-          4096
+          5331,
+          5409
         ],
         "name": "IDaiToken",
         "nodeType": "ContractDefinition",
         "nodes": [],
-        "scope": 4019,
-        "src": "131:42:6"
+        "scope": 5332,
+        "src": "131:42:8"
       }
     ],
-    "src": "0:173:6"
+    "src": "0:173:8"
   },
   "compiler": {
     "name": "solc",
@@ -347,7 +347,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-22T09:30:09.191Z",
+  "updatedAt": "2020-11-05T10:53:43.168Z",
   "devdoc": {
     "methods": {
       "allowance(address,address)": {

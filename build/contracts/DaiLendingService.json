@@ -2424,7 +2424,7 @@
                       "lValueRequested": false,
                       "memberName": "transferContractOwnership",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4975,
+                      "referencedDeclaration": 6593,
                       "src": "2407:44:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_payable_$returns$__$",
@@ -4921,7 +4921,7 @@
                       "lValueRequested": false,
                       "memberName": "transferContractOwnership",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 4975,
+                      "referencedDeclaration": 6593,
                       "src": "2407:44:1",
                       "typeDescriptions": {
                         "typeIdentifier": "t_function_external_nonpayable$_t_address_payable_$returns$__$",
@@ -5197,12 +5197,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "0x7efCcDB904f6B659319653D06e42E53dc5EdC6C8",
-      "transactionHash": "0x05ecd2d3e1ab6a077927aaf3338dd9fd7ed149287299e0fe4815419a9b9eb79d"
+      "address": "0xAdA70Db2beffA1Ef94Ed591c57fae6F534ae47B7",
+      "transactionHash": "0xfced628108c44fc036e7fe2ec0db1272c72bd48496d2c854ca4515ef5e37cc50"
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-22T09:30:30.549Z",
+  "updatedAt": "2020-11-05T10:54:24.564Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

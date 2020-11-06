@@ -26068,12 +26068,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "0x67c59a135592657eb39dc0bE0248DD9f3823f235",
-      "transactionHash": "0x1c8d3b10ceb2133803a02ca97b7391cd70538b1faf7f598ed5e2f9fd91d4cece"
+      "address": "0xDFD064A1F29369E8962b0F34f92576A454dc5f1D",
+      "transactionHash": "0x49acdaacdcbf0a3a38e55c17934e22b14da83e7d6b5d090839ed7e274665da97"
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-10-22T09:30:30.613Z",
+  "updatedAt": "2020-11-05T10:54:24.573Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}

@@ -173,6 +173,11 @@ contract Groups is IGroupSchema, StorageOwners {
         Groups[index].creatorAddress = creatorAddress;
     }
 
+    //get groups in contract
+    function getGroup() external view returns ( Group[] memory ) {
+        return Groups
+    }
+
     function doesGroupExist(uint256 groupId) external view returns (bool) {
         return _doesGroupExist(groupId);
     }
@@ -405,4 +410,6 @@ contract Groups is IGroupSchema, StorageOwners {
         uint256 index = GroupIndexer[groupId].index;
         return index;
     }
+
+    
 }

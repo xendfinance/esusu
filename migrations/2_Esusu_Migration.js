@@ -1,79 +1,85 @@
-const EsusuAdapter = artifacts.require("EsusuAdapter");
-const DaiLendingService = artifacts.require("DaiLendingService");
-const DaiLendingAdapter = artifacts.require("DaiLendingAdapter");
-const TreasuryContract = artifacts.require("Treasury");
-const SavingsConfigContract = artifacts.require("SavingsConfig");
-const EsusuServiceContract = artifacts.require("EsusuService");
-const GroupsContract = artifacts.require("Groups");
-const RewardConfigContract = artifacts.require("RewardConfig");
-const xendTokenContract = artifacts.require("XendToken");
 
-module.exports = async (deployer) => {
-  await deployer.deploy(DaiLendingService);
+//  1. Ensure you have done truffle compile to ensure the contract ABI has been added to the artifact
+const DaiLendingAdapterContract = artifacts.require("DaiLendingAdapter");
+const DaiLendingServiceContract = artifacts.require("DaiLendingService");
+const GroupsContract = artifacts.require('Groups');
+const TreasuryContract = artifacts.require('Treasury');
+const SavingsConfigContract = artifacts.require('SavingsConfig');
+const XendTokenContract = artifacts.require('XendToken');
+const EsusuServiceContract = artifacts.require('EsusuService');
+const RewardConfigContract = artifacts.require('RewardConfig');
+const EsusuAdapterContract = artifacts.require('EsusuAdapter');
+const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWithdrawalDelegate');
+const EsusuStorageContract = artifacts.require('EsusuStorage');
 
-  await deployer.deploy(DaiLendingAdapter, DaiLendingService.address);
+module.exports = function (deployer) {
+  
+  console.log("********************** Running Esusu Migrations *****************************");
 
-  console.log(
-    "DaiLendingService Contract address: " + DaiLendingService.address
-  );
+  deployer.then(async () => {
 
-  console.log(
-    "DaiLendingAdapterContract address: " + DaiLendingAdapter.address
-  );
 
-  await deployer.deploy(TreasuryContract);
+     await deployer.deploy(GroupsContract);
 
-  console.log("TreasuryContract address: " + TreasuryContract.address);
+     await deployer.deploy(TreasuryContract);
 
-  await deployer.deploy(SavingsConfigContract);
+     await deployer.deploy(SavingsConfigContract);
 
-  console.log(
-    "SavingsConfigContract address: " + SavingsConfigContract.address
-  );
+     await deployer.deploy(DaiLendingServiceContract);
 
-  await deployer.deploy(EsusuServiceContract);
+     await deployer.deploy(DaiLendingAdapterContract,DaiLendingServiceContract.address);
 
-  console.log("EsusuServiceContract address: " + EsusuServiceContract.address);
+     await deployer.deploy(XendTokenContract, "Xend Token", "$XEND","18","200000000000000000000000000");
 
-  await deployer.deploy(GroupsContract);
+     await deployer.deploy(EsusuServiceContract);
+    
+     await deployer.deploy(RewardConfigContract,EsusuServiceContract.address, GroupsContract.address);
+    
+     await deployer.deploy(EsusuStorageContract);
 
-  console.log("GroupsContract address: " + GroupsContract.address);
+    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract, 
+    //                 string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract
 
-  await deployer.deploy(
-    RewardConfigContract,
-    EsusuServiceContract.address,
-    GroupsContract.address
-  );
+     await deployer.deploy(EsusuAdapterContract,
+                            EsusuServiceContract.address,
+                            SavingsConfigContract.address,
+                            GroupsContract.address,
+                            EsusuStorageContract.address);
 
-  console.log("RewardConfigContract address: " + RewardConfigContract.address);
+      await deployer.deploy(EsusuAdapterWithdrawalDelegateContract,
+                              EsusuServiceContract.address, 
+                              EsusuStorageContract.address,
+                              EsusuAdapterContract.address,
+                              "esusufee",
+                              TreasuryContract.address,
+                              RewardConfigContract.address,
+                              XendTokenContract.address,
+                              SavingsConfigContract.address);
+                              
+     console.log("Groups Contract address: "+GroupsContract.address);
 
-  await deployer.deploy(xendTokenContract, "Xend Token", "XTK", 18, 2000000);
+     console.log("Treasury Contract address: "+TreasuryContract.address);
 
-  console.log("xendTokenContract address: " + xendTokenContract.address);
+     console.log("SavingsConfig Contract address: "+SavingsConfigContract.address);
 
-  await deployer.deploy(
-    EsusuAdapter,
-    EsusuServiceContract.address,
-    TreasuryContract.address,
-    SavingsConfigContract.address,
-    "Njoku",
-    GroupsContract.address,
-    RewardConfigContract.address,
-    xendTokenContract.address
-  );
+     console.log("DaiLendingService Contract address: " + DaiLendingServiceContract.address);
 
-  console.log("EsusuAdapter address: " + EsusuAdapter.address)
+     console.log("DaiLendingAdapter Contract address: "+DaiLendingAdapterContract.address );
+
+     console.log("XendToken Contract address: "+XendTokenContract.address );
+
+     console.log("EsusuService Contract address: "+EsusuServiceContract.address );
+
+     console.log("EsusuStorage Contract address: "+EsusuStorageContract.address );
+
+     console.log("EsusuAdapterWithdrawalDelegate Contract address: "+EsusuAdapterWithdrawalDelegateContract.address );
+
+     console.log("RewardConfig Contract address: "+RewardConfigContract.address );
+
+     console.log("EsusuAdapter Contract address: "+EsusuAdapterContract.address );
+
+  })
+  
 };
 
-// module.exports = async (deployer) =>{
-//     const treasuryContract = 0xd9145CCE52D386f254917e481eB44e9943F39138;
-//     const feeRuleKey = "njoku";
-//     const serviceContract = 0xcD6a42782d230D7c13A74ddec5dD140e55499Df9;
-//     // const esusuServiceContract = 0xD7ACd2a9FD159E69Bb102A1ca21C9a3e3A5F771B;
-//     const savingsConfigContract = 0x358AA13c52544ECCEF6B0ADD0f801012ADAD5eE3;
-//     const groupsContract = 0xddaAd340b0f1Ef65169Ae5E41A8b10776a75482d;
-//     const rewardConfigContract = 0x0fC5025C764cE34df352757e82f7B5c4Df39A836;
-//     const xendTokenAddress = 0xb27A31f1b0AF2946B7F582768f03239b1eC07c2c;
 
-//     await deployer.deploy(EsusuAdapter, serviceContract, treasuryContract, savingsConfigContract, feeRuleKey, groupsContract, rewardConfigContract, xendTokenAddress)
-// }
