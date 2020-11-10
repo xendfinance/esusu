@@ -8,7 +8,6 @@ import './IERC20.sol';
 */
 interface IDaiToken is IERC20{
      
-    function getDaiContractAddress() external view returns(address);
-       
+    function getDaiContractAddress() external view returns(address);      
 }
 

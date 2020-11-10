@@ -124,7 +124,7 @@ contract EsusuStorage {
                                                             uint PayoutIntervalSeconds, uint CycleState, 
                                                             uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
                                                             uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
-                                                            uint TotalBeneficiaries, uint MaxMembers){
+                                                            uint TotalBeneficiaries, uint MaxMembers, uint GroupId){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
@@ -134,7 +134,7 @@ contract EsusuStorage {
                 uint256(cycle.CycleState),
                 cycle.TotalMembers, cycle.TotalAmountDeposited, cycle.TotalShares,
                 cycle.TotalCycleDuration, cycle.TotalCapitalWithdrawn, cycle.CycleStartTime,
-                cycle.TotalBeneficiaries, cycle.MaxMembers);
+                cycle.TotalBeneficiaries, cycle.MaxMembers, cycle.GroupId);
         
     }
     
