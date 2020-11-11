@@ -124,7 +124,7 @@ contract EsusuStorage {
                                                             uint PayoutIntervalSeconds, uint CycleState, 
                                                             uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
                                                             uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
-                                                            uint TotalBeneficiaries, uint MaxMembers, uint GroupId){
+                                                            uint TotalBeneficiaries, uint MaxMembers){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
@@ -134,12 +134,12 @@ contract EsusuStorage {
                 uint256(cycle.CycleState),
                 cycle.TotalMembers, cycle.TotalAmountDeposited, cycle.TotalShares,
                 cycle.TotalCycleDuration, cycle.TotalCapitalWithdrawn, cycle.CycleStartTime,
-                cycle.TotalBeneficiaries, cycle.MaxMembers, cycle.GroupId);
+                cycle.TotalBeneficiaries, cycle.MaxMembers);
         
     }
     
     
-    function GetEsusuCycleBasicInformation(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers){
+    function GetEsusuCycleBasicInformation(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers, uint PayoutIntervalSeconds, uint GroupId){
         
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
@@ -147,9 +147,10 @@ contract EsusuStorage {
         
         return (cycle.CycleId, cycle.DepositAmount, 
                 uint256(cycle.CycleState),
-                cycle.TotalMembers, cycle.MaxMembers);
+                cycle.TotalMembers, cycle.MaxMembers, cycle.PayoutIntervalSeconds, cycle.GroupId);
         
     } 
+    
     
     function GetEsusuCycleTotalShares(uint esusuCycleId) external view returns(uint TotalShares){
         
