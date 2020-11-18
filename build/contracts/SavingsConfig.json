@@ -11539,12 +11539,12 @@
     "1": {
       "events": {},
       "links": {},
-      "address": "0x39C2296Ea4a5595b74fc396570A4C7a730C1E561",
-      "transactionHash": "0x77248a7cc92972981d7025e9612fe1771a0feb11811a0bb007bb84650bda4e91"
+      "address": "0x3A5B2941E678911f75e8277E382B4CCf93E296FD",
+      "transactionHash": "0x33d673f5339b45d67ecbfae21e06528c81f9b1826c54490a9d5f7dc15b6e8391"
     }
   },
   "schemaVersion": "3.2.5",
-  "updatedAt": "2020-11-05T10:54:24.599Z",
+  "updatedAt": "2020-11-09T12:09:20.484Z",
   "networkType": "ethereum",
   "devdoc": {
     "methods": {}
