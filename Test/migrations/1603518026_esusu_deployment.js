@@ -13,7 +13,7 @@ const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWi
 const EsusuStorageContract = artifacts.require('EsusuStorage');
 
 module.exports = function (deployer) {
-  
+
   console.log("********************** Running Esusu Migrations *****************************");
 
   deployer.then(async () => {
@@ -32,12 +32,12 @@ module.exports = function (deployer) {
      await deployer.deploy(XendTokenContract, "Xend Token", "$XEND","18","200000000000000000000000000");
 
      await deployer.deploy(EsusuServiceContract);
-    
+
      await deployer.deploy(RewardConfigContract,EsusuServiceContract.address, GroupsContract.address);
-    
+
      await deployer.deploy(EsusuStorageContract);
 
-    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract, 
+    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
     //                 string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract
 
      await deployer.deploy(EsusuAdapterContract,
@@ -47,7 +47,7 @@ module.exports = function (deployer) {
                             EsusuStorageContract.address);
 
       await deployer.deploy(EsusuAdapterWithdrawalDelegateContract,
-                              EsusuServiceContract.address, 
+                              EsusuServiceContract.address,
                               EsusuStorageContract.address,
                               EsusuAdapterContract.address,
                               "esusufee",
@@ -55,7 +55,7 @@ module.exports = function (deployer) {
                               RewardConfigContract.address,
                               XendTokenContract.address,
                               SavingsConfigContract.address);
-                              
+
      console.log("Groups Contract address: "+GroupsContract.address);
 
      console.log("Treasury Contract address: "+TreasuryContract.address);
@@ -78,8 +78,70 @@ module.exports = function (deployer) {
 
      console.log("EsusuAdapter Contract address: "+EsusuAdapterContract.address );
 
+     let daiLendingAdapterContract = null;
+     let daiLendingServiceContract = null;
+     let savingsConfigContract = null;
+     let esusuAdapterContract = null;
+     let esusuServiceContract = null;
+     let groupsContract = null;
+     let xendTokenContract = null;
+     let esusuAdapterWithdrawalDelegateContract = null;
+     let esusuStorageContract = null;
+
+     savingsConfigContract = await SavingsConfigContract.deployed();
+     daiLendingAdapterContract = await DaiLendingAdapterContract.deployed();
+     daiLendingServiceContract = await DaiLendingServiceContract.deployed();
+     esusuAdapterContract = await EsusuAdapterContract.deployed();
+     esusuServiceContract = await EsusuServiceContract.deployed();
+     groupsContract = await GroupsContract.deployed();
+     xendTokenContract = await XendTokenContract.deployed();
+     esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
+     esusuStorageContract = await EsusuStorageContract.deployed();
+
+     //1. Create SavingsConfig rules
+     await savingsConfigContract.createRule("esusufee",0,0,1000,1);
+
+     console.log("1->Savings Config Rule Created ...");
+
+     //2. Update the DaiLendingadapter Address in the DaiLendingService Contract
+     await daiLendingServiceContract.updateAdapter(daiLendingAdapterContract.address);
+     console.log("2->DaiLendingAdapter Address Updated In DaiLendingService ...");
+
+     //3. Update the DaiLendingService Address in the EsusuAdapter Contract
+     await esusuAdapterContract.UpdateDaiLendingService(daiLendingServiceContract.address);
+     console.log("3->DaiLendingService Address Updated In EsusuAdapter ...");
+
+     //4. Update the EsusuAdapter Address in the EsusuService Contract
+     await esusuServiceContract.UpdateAdapter(esusuAdapterContract.address);
+     console.log("4->EsusuAdapter Address Updated In EsusuService ...");
+
+     //5. Activate the storage oracle in Groups.sol with the Address of the EsusuApter
+     await  groupsContract.activateStorageOracle(esusuAdapterContract.address);
+     console.log("5->EsusuAdapter Address Updated In Groups contract ...");
+
+     //6. Xend Token Should Grant access to the  Esusu Adapter Contract
+     await xendTokenContract.grantAccess(esusuAdapterContract.address);
+     console.log("6->Xend Token Has Given access To Esusu Adapter to transfer tokens ...");
+
+     //7. Esusu Adapter should Update Esusu Adapter Withdrawal Delegate
+     await esusuAdapterContract.UpdateEsusuAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+     console.log("7->EsusuAdapter Has Updated Esusu Adapter Withdrawal Delegate Address ...");
+
+     //8. Esusu Adapter Withdrawal Delegate should Update Dai Lending Service
+     await esusuAdapterWithdrawalDelegateContract.UpdateDaiLendingService(daiLendingServiceContract.address);
+     console.log("8->Esusu Adapter Withdrawal Delegate Has Updated Dai Lending Service ...");
+
+     //9. Esusu Service should update esusu adapter withdrawal delegate
+     await esusuServiceContract.UpdateAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
+     console.log("9->Esusu Service Contract Has Updated  Esusu Adapter Withdrawal Delegate Address ...");
+
+     //10. Esusu Storage should Update Adapter and Adapter Withdrawal Delegate
+     await esusuStorageContract.UpdateAdapterAndAdapterDelegateAddresses(esusuAdapterContract.address,esusuAdapterWithdrawalDelegateContract.address);
+     console.log("10->Esusu Storage Contract Has Updated  Esusu Adapter and Esusu Adapter Withdrawal Delegate Address ...");
+
+     //11. Xend Token Should Grant access to the  Esusu Adapter Withdrawal Delegate Contract
+     await xendTokenContract.grantAccess(esusuAdapterWithdrawalDelegateContract.address);
+     console.log("11->Xend Token Has Given access To Esusu Adapter Withdrawal Delegate to transfer tokens ...");
   })
-  
+
 };
-
-
