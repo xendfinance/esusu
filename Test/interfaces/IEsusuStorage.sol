@@ -27,6 +27,14 @@ interface IEsusuStorage {
     function GetTotalDeposits() external view returns (uint);
     function GetEsusuCycleState(uint esusuCycleId) external view returns (uint);
     function GetEsusuCycleTotalSharesAtStart(uint esusuCycleId) external view returns(uint TotalSharesAtStart);
+    function GetCycleIndexFromGroupId(uint groupId) external view returns(uint);
+    function GetCycleIdFromCycleIndexAndGroupId(uint groupId, uint cycleIndex) external view returns(uint);
+    function GetCycleIndexFromCycleCreator(address cycleCreator) external view returns(uint);
+    function GetCycleIdFromCycleIndexAndCycleCreator(uint cycleIndex, address cycleCreator) external view returns(uint);
+    function GetCycleIndexFromCycleMember(address member) external view returns(uint);
+    function GetCycleIdFromCycleIndexAndCycleMember(uint cycleIndex, address member) external view returns(uint);
+
+
     /* Setters - only owner or service contract can call */
 
     function CreateEsusuCycleMapping(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds, address owner, uint maxMembers) external;
@@ -41,4 +49,5 @@ interface IEsusuStorage {
     function UpdateEsusuCycleDuringCapitalWithdrawal(uint esusuCycleId, uint cycleTotalShares, uint totalCapitalWithdrawnInCycle) external;
     function UpdateEsusuCycleDuringROIWithdrawal(uint esusuCycleId, uint totalShares, uint totalBeneficiaries) external;
     function CreateEsusuCycleToBeneficiaryMapping(uint esusuCycleId, address memberAddress, uint memberROINet) external;
+    function CreateMemberToCycleIndexToCycleIDMapping(address member, uint esusuCycleId) external;
 }
