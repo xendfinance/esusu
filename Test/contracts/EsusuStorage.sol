@@ -79,6 +79,19 @@ contract EsusuStorage {
 
     mapping(uint=>mapping(address=> uint)) CycleToMemberWithdrawnCapitalMapping;    // This tracks members that have withdrawn their capital and the amount withdrawn
 
+    mapping(uint=>uint) GroupToCycleIndexMapping; //  This tracks the total number of cycles that belong to a group
+
+    mapping(uint=>mapping(uint=>uint)) GroupToCycleIndexToCycleIDMapping; //  This maps the Group to the cycle index and then the cycle ID
+
+    mapping(address=>uint) OwnerToCycleIndexMapping; //  This tracks the number of cycles by index created by an owner
+
+    mapping(address=>mapping(uint=>uint)) OwnerToCycleIndexToCycleIDMapping; //  This maps the owner to the cycle index and then to the cycle ID
+
+    mapping(address=>uint) MemberToCycleIndexMapping; //  This tracks the number of cycles by index created by a member
+
+    mapping(address=>mapping(uint=>uint)) MemberToCycleIndexToCycleIDMapping; //  This maps the member to the cycle index and then to the cycle ID
+
+
     uint TotalDeposits; //  This holds all the dai amounts users have deposited in this contract
 
 
@@ -120,6 +133,18 @@ contract EsusuStorage {
 
          //  Assign groupId
         EsusuCycleMapping[EsusuCycleId].GroupId = groupId;
+        GroupToCycleIndexMapping[groupId] = GroupToCycleIndexMapping[groupId].add(1); //  Increase the cycle index in the group by 1
+
+        uint cycleIndex = GroupToCycleIndexMapping[groupId];
+        mapping(uint=>uint) storage cylceIndexToCycleId = GroupToCycleIndexToCycleIDMapping[groupId];
+        cylceIndexToCycleId[cycleIndex] = EsusuCycleId;
+
+        // Increase the number of cycles created by the owner
+        OwnerToCycleIndexMapping[owner] = OwnerToCycleIndexMapping[owner].add(1);
+
+        uint ownerCreatedCycleIndex = OwnerToCycleIndexMapping[owner];
+        mapping(uint=>uint) storage ownerCreatedCylceIndexToCycleId = OwnerToCycleIndexToCycleIDMapping[owner];
+        ownerCreatedCylceIndexToCycleId[ownerCreatedCycleIndex] = EsusuCycleId;
     }
 
     function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount,
@@ -139,6 +164,43 @@ contract EsusuStorage {
                 cycle.TotalBeneficiaries, cycle.MaxMembers);
 
     }
+
+    function GetCycleIndexFromGroupId(uint groupId) external view returns(uint){
+
+        return GroupToCycleIndexMapping[groupId];
+    }
+
+    function GetCycleIdFromCycleIndexAndGroupId(uint groupId, uint cycleIndex) external view returns(uint){
+
+      mapping(uint=>uint) storage cylceIndexToCycleId = GroupToCycleIndexToCycleIDMapping[groupId];
+
+      return cylceIndexToCycleId[cycleIndex];
+    }
+
+    function GetCycleIndexFromCycleCreator(address cycleCreator) external view returns(uint){
+
+        return OwnerToCycleIndexMapping[cycleCreator];
+    }
+
+    function GetCycleIdFromCycleIndexAndCycleCreator(uint cycleIndex, address cycleCreator) external view returns(uint){
+
+      mapping(uint=>uint) storage ownerCreatedCylceIndexToCycleId = OwnerToCycleIndexToCycleIDMapping[cycleCreator];
+
+      return ownerCreatedCylceIndexToCycleId[cycleIndex];
+    }
+
+    function GetCycleIndexFromCycleMember(address member) external view returns(uint){
+
+        return MemberToCycleIndexMapping[member];
+    }
+
+    function GetCycleIdFromCycleIndexAndCycleMember(uint cycleIndex, address member) external view returns(uint){
+
+      mapping(uint=>uint) storage memberCreatedCylceIndexToCycleId = MemberToCycleIndexToCycleIDMapping[member];
+
+      return memberCreatedCylceIndexToCycleId[cycleIndex];
+    }
+
 
 
     function GetEsusuCycleBasicInformation(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers, uint PayoutIntervalSeconds, uint GroupId){
@@ -169,7 +231,7 @@ contract EsusuStorage {
 
         return (cycle.TotalSharesAtStart);
     }
-    function GetEsusuCycleStartTime(uint esusuCycleId)external view returns(uint EsusuCycleStartTime){
+    function GetEsusuCycleStartonlyOwnerAdapterAndAdapterDelegateContractTime(uint esusuCycleId)external view returns(uint EsusuCycleStartTime){
 
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
 
@@ -364,6 +426,15 @@ contract EsusuStorage {
 
         uint withdrawalTime = (EsusuCycleMapping[cycleId].CycleStartTime.add(memberPosition.mul(EsusuCycleMapping[cycleId].PayoutIntervalSeconds)));
         return withdrawalTime;
+    }
+
+    function CreateMemberToCycleIndexToCycleIDMapping(address member, uint esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract {
+      // Increase the number of cycles joined by the member
+      MemberToCycleIndexMapping[member] = MemberToCycleIndexMapping[member].add(1);
+
+      uint memberCreatedCycleIndex = MemberToCycleIndexMapping[member];
+      mapping(uint=>uint) storage memberCreatedCylceIndexToCycleId = MemberToCycleIndexToCycleIDMapping[member];
+      memberCreatedCylceIndexToCycleId[memberCreatedCycleIndex] = esusuCycleId;
     }
 
     function GetTotalDeposits() external view returns (uint){

@@ -242,8 +242,10 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
 
         //  Increase TotalMembers count by 1
         _esusuStorage.IncreaseTotalMembersInCycle(esusuCycleId);
-
+        //  Create the position of the member in the cycle
         _esusuStorage.CreateMemberPositionMapping(CycleId, member);
+        //  Create mapping to track the Cycles a member belongs to by index and by ID
+        _esusuStorage.CreateMemberToCycleIndexToCycleIDMapping(member, CycleId);
 
         //  emit event
         emit JoinEsusuCycleEvent(
