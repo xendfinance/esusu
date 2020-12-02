@@ -236,6 +236,27 @@ const { Contract } = require('web3-eth-contract');
          * MinimumNumberOfSeconds = 2592000;      //  This determines whether we are checking time level by days, weeks, months or years. It is 30 days(1 month) in seconds by default
          * MaximumTimeLevel;                      //  This determines how many levels can be derived based on the MinimumNumberOfSeconds that has been set
          */
+        it('Reward Config: Should Set reward parameters and Set RewardActive to true and log reward',async () => {
+            await rewardConfigContract.SetRewardParams("100000000000000000000000000", "10000000000000000000000000", "2",
+                "7", "10","15", "4","120", "4");
+
+
+            var result = await rewardConfigContract.GetRewardActive();
+            assert(result === false);
+
+            await rewardConfigContract.SetRewardActive(true);
+            result = await rewardConfigContract.GetRewardActive();
+
+            var totalCycleTimeInSeconds = "2592000";            //  30 days
+            var amountDeposited = "1000000000000000000000";     //  1000 Dai
+            var reward = await rewardConfigContract.CalculateIndividualSavingsReward(totalCycleTimeInSeconds, amountDeposited);
+
+            console.log(BigInt(reward).toString());
+
+            assert(result === true);
+
+        });
+
         it('Reward Config: Should Set reward parameters and Set RewardActive to true',async () => {
             await rewardConfigContract.SetRewardParams("100000000000000000000000000", "10000000000000000000000000", "2",
                 "7", "10","15", "4","2592000", "4");
@@ -443,7 +464,7 @@ const { Contract } = require('web3-eth-contract');
             assert(result0.toString() === "1");
 
             console.log(`Current Threshold Level: ${result0.toString()}`);
-
+0x9FE325bcC3C18f270888BaF33aAb719a420e4De5
         });
 
 

@@ -165,6 +165,17 @@ contract EsusuStorage {
 
     }
 
+
+    function GetEsusuCycleStartTime(uint esusuCycleId)external view returns(uint EsusuCycleStartTime){
+
+        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
+
+        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+
+        return (cycle.CycleStartTime);
+    }
+
+
     function GetCycleIndexFromGroupId(uint groupId) external view returns(uint){
 
         return GroupToCycleIndexMapping[groupId];

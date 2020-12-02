@@ -87,6 +87,7 @@ module.exports = function (deployer) {
      let xendTokenContract = null;
      let esusuAdapterWithdrawalDelegateContract = null;
      let esusuStorageContract = null;
+     let rewardConfigContract = null;
 
      savingsConfigContract = await SavingsConfigContract.deployed();
      daiLendingAdapterContract = await DaiLendingAdapterContract.deployed();
@@ -97,8 +98,9 @@ module.exports = function (deployer) {
      xendTokenContract = await XendTokenContract.deployed();
      esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
      esusuStorageContract = await EsusuStorageContract.deployed();
+     rewardConfigContract = await RewardConfigContract.deployed();
 
-     //1. Create SavingsConfig rules
+     // 1. Create SavingsConfig rules
      await savingsConfigContract.createRule("esusufee",0,0,1000,1);
 
      console.log("1->Savings Config Rule Created ...");
@@ -142,6 +144,12 @@ module.exports = function (deployer) {
      //11. Xend Token Should Grant access to the  Esusu Adapter Withdrawal Delegate Contract
      await xendTokenContract.grantAccess(esusuAdapterWithdrawalDelegateContract.address);
      console.log("11->Xend Token Has Given access To Esusu Adapter Withdrawal Delegate to transfer tokens ...");
+
+     //12.
+     await rewardConfigContract.SetRewardParams("100000000000000000000000000", "10000000000000000000000000", "2", "7", "10","15", "4","60", "4");
+
+     //13. 
+     await rewardConfigContract.SetRewardActive(true);
   })
 
 };

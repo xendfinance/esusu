@@ -36,6 +36,13 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         );
 
+        event XendTokenReward (
+          uint date,
+          address indexed member,
+          uint cycleId,
+          uint amount
+          );
+
         enum CycleStateEnum{
             Idle,               // Cycle has just been created and members can join in this state
             Active,             // Cycle has started and members can take their ROI
@@ -63,7 +70,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
 
-    
+
         constructor(address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
                     string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract, address savingsConfigContract)public OwnableService(serviceContract){
 
@@ -126,7 +133,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         _dai.transfer(member, DepositAmount);
 
         //  Reward member with Xend Tokens
-        _rewardMember(_esusuStorage.GetEsusuCycleDuration(esusuCycleId),member,DepositAmount);
+        _rewardMember(_esusuStorage.GetEsusuCycleDuration(esusuCycleId),member,DepositAmount, esusuCycleId);
 
         //  Get the yDaiSharesForContractAfterWithdrawal
         uint yDaiSharesForContractAfterWithdrawal = _yDai.balanceOf(address(this));
@@ -442,13 +449,18 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         emit ROIWithdrawalEvent(now, member,esusuCycleId,Mroi);
     }
+    function _emitXendTokenReward(address member, uint amount, uint esusuCycleId) internal {
+      emit XendTokenReward(now, member, esusuCycleId, amount);
+    }
 
-    function _rewardMember(uint totalCycleTime, address member, uint amount) internal {
+    function _rewardMember(uint totalCycleTime, address member, uint amount, uint esusuCycleId) internal {
 
         uint reward = _rewardConfigContract.CalculateEsusuReward(totalCycleTime, amount);
 
         // get Xend Token contract and mint token for member
         _xendTokenContract.mint(payable(member), reward);
+
+        _emitXendTokenReward(member, reward, esusuCycleId);
     }
 
     function DepricateContract(string calldata reason) external onlyOwner{
