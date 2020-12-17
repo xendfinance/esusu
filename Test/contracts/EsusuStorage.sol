@@ -241,6 +241,15 @@ contract EsusuStorage {
         return amount;
     }
     
+    function GetTotalMembersInCycle(uint esusuCycleId)external view returns(uint TotalMembers){
+         
+        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
+        
+        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+        
+        return (cycle.TotalMembers);      
+    }
+
     function IsMemberInCycle(address memberAddress,uint esusuCycleId ) external view returns(bool){
         
         mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[memberAddress];

@@ -59,7 +59,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IEsusuStorage _esusuStorage;
         IEsusuAdapter _esusuAdapterContract;
         IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-        IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
+        IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
 
@@ -205,7 +205,12 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
             - Ta = Tnow - Bt
             - Troi = ((balanceShares * pricePerFullShare ) - TotalDeposited - TotalCapitalWithdrawn)
             - Mroi = (Total accumulated ROI at Tnow) / (Ta)   
-        
+                    
+            Equations - Update from CertiK Audit
+            - Bt = number of beneficiaries
+            - Ta = Total Members In Cycle - Bt
+            - Troi = ((balanceShares * pricePerFullShare ) - TotalDeposited - TotalCapitalWithdrawn)
+            - Mroi = (Total accumulated ROI at Tnow) / (Ta) 
         NOTE: As members withdraw their funds, the yDai balanceShares will change and we will be updating the TotalShares with this new value
         at all times till TotalShares becomes approximately zero when all amounts have been withdrawn including capital invested
         
@@ -214,26 +219,26 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
             - Change in yDaiSharesForContract = yDai.balanceOf(address(this)) before withdraw operation - yDai.balanceOf(address(this)) after withdraw operation
         
     */
-    
-    function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member)  public active onlyOwnerAndServiceContract {
-        
+        function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member)  public active onlyOwnerAndServiceContract {
+        uint totalMembers = _esusuStorage.GetTotalMembersInCycle(esusuCycleId);
+
         bool isMemberEligibleToWithdraw = _isMemberEligibleToWithdrawROI(esusuCycleId,member);
         
         require(isMemberEligibleToWithdraw, "Member cannot withdraw at this time");
         
         uint currentBalanceShares = _esusuStorage.GetEsusuCycleTotalShares(esusuCycleId);
         
-        uint pricePerFullShare = _iDaiLendingService.getPricePerFullShare();
+        // uint pricePerFullShare = _iDaiLendingService.getPricePerFullShare();
         
-        uint overallGrossDaiBalance = currentBalanceShares.mul(pricePerFullShare).div(1e18);
+        uint overallGrossDaiBalance = currentBalanceShares.mul(_iDaiLendingService.getPricePerFullShare()).div(1e18);
         
         uint CycleId = esusuCycleId;
         // address memberAddress = member;
         
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
-        uint Bt = _esusuStorage.GetEsusuCyclePayoutInterval(esusuCycleId).mul(_esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId));
+        uint Bt = _esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId);
 
-        uint Ta = now.sub(Bt);
+        uint Ta = totalMembers - Bt;
         uint Troi = overallGrossDaiBalance.sub(_esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId).sub(_esusuStorage.GetEsusuCycleTotalCapitalWithdrawn(esusuCycleId)));
 
         uint Mroi = Troi.div(Ta);
@@ -291,6 +296,68 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         //  emit event 
         _emitROIWithdrawalEvent(member,Mroi,CycleId);
     }
+
+    // function WithdrawROIFromEsusuCycle(uint esusuCycleId, address member)  public active onlyOwnerAndServiceContract {
+    //     //  Get Esusu Cycle Basic information
+    //     (uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers) = _esusuStorage.GetEsusuCycleBasicInformation(esusuCycleId);
+                
+    //     require( _isMemberEligibleToWithdrawROI(esusuCycleId,member), "Member cannot withdraw at this time");
+        
+    //     uint currentBalanceShares = _esusuStorage.GetEsusuCycleTotalShares(esusuCycleId);
+                                
+    //     //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
+    //     uint Troi = currentBalanceShares.mul(_iDaiLendingService.getPricePerFullShare()).div(1e18).sub(_esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId).sub(_esusuStorage.GetEsusuCycleTotalCapitalWithdrawn(esusuCycleId)));
+
+    //     uint Mroi = Troi.div(TotalMembers.sub(_esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId)));
+        
+    //     //  Get the current yDaiSharesPerCycle and call the WithdrawByShares function on the daiLending Service
+    //     // uint yDaiSharesPerCycle = currentBalanceShares;
+        
+    //     //  transfer yDaiShares from the adapter contract to here 
+    //     _esusuAdapterContract.TransferYDaiSharesToWithdrawalDelegate(currentBalanceShares);
+        
+    //     //  Get the yDaiSharesForContractBeforeWithdrawal 
+    //     uint yDaiSharesForContractBeforeWithdrawal = _yDai.balanceOf(address(this));
+        
+    //     //  Withdraw the Dai. At this point, we have withdrawn the Dai ROI for this member and the dai ROI is in this contract, we will now transfer it to the member        
+    //     //  Before this function is called, we will have triggered a transfer of yDaiShares from the adapter to this withdrawal contract 
+    //     _yDai.approve(_iDaiLendingService.GetDaiLendingAdapterAddress(),currentBalanceShares);
+    //     _iDaiLendingService.WithdrawByShares(Mroi,currentBalanceShares);
+        
+        
+    //     //  Now the Dai is in this contract, transfer the net ROI to the member and fee to treasury contract 
+    //     sendROI(Mroi,member,CycleId);
+        
+        
+        
+        
+    //     require(yDaiSharesForContractBeforeWithdrawal > _yDai.balanceOf(address(this)), "yDai shares before withdrawal must be greater !!!");
+        
+    //     //  Update the total balanceShares for this cycle 
+    //     uint totalShares = currentBalanceShares.sub(yDaiSharesForContractBeforeWithdrawal.sub(_yDai.balanceOf(address(this))));
+        
+    //     //  Increase total number of beneficiaries by 1
+        
+    //     /*
+                
+    //         - Check whether the TotalCycleDuration has elapsed, if that is the case then this cycle has expired
+    //         - If cycle has expired then we move the left over yDai to treasury
+    //     */
+        
+    //     if(now > _esusuStorage.GetEsusuCycleDuration(CycleId)){
+            
+    //         _esusuStorage.UpdateEsusuCycleState(CycleId, uint(CycleStateEnum.Expired));
+    //     }
+        
+    //     //  Update Esusu Cycle During ROI withdrawal 
+    //     _esusuStorage.UpdateEsusuCycleDuringROIWithdrawal(CycleId, totalShares,_esusuStorage.GetEsusuCycleTotalBeneficiaries(CycleId).add(1));
+        
+    //     //  Send the yDai shares back to the adapter contract, this contract should not hold any coins
+    //     _yDai.transfer(address(_esusuAdapterContract),_yDai.balanceOf(address(this)));
+        
+    //     //  emit event 
+    //     _emitROIWithdrawalEvent(member,Mroi,CycleId);
+    // }
     
     /*
         This gets the fee percentage from the fee contract, deducts the fee and sends to treasury contract 

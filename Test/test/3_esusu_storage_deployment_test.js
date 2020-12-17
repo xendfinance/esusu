@@ -19,9 +19,9 @@
      *  15. CreateEsusuCycleToBeneficiaryMapping    -   Done
      *  16. CalculateMemberWithdrawalTime           -   Done
      */
-    // if(true){
-    //     return;
-    // }
+    if(true){
+        return;
+    }
     console.log("********************** Running Esusu Storage Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');

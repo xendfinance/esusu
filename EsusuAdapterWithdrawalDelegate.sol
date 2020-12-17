@@ -206,7 +206,13 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
             - Ta = Tnow - Bt
             - Troi = ((balanceShares * pricePerFullShare ) - TotalDeposited - TotalCapitalWithdrawn)
             - Mroi = (Total accumulated ROI at Tnow) / (Ta)   
-        
+
+            TODO: Equation Update to implement
+            - Bt = number of beneficiaries
+            - Ta = Total Members In cycle - Bt
+            - Troi = ((balanceShares * pricePerFullShare ) - TotalDeposited - TotalCapitalWithdrawn)
+            - Mroi = (Total accumulated ROI at Tnow) / (Ta)
+
         NOTE: As members withdraw their funds, the yDai balanceShares will change and we will be updating the TotalShares with this new value
         at all times till TotalShares becomes approximately zero when all amounts have been withdrawn including capital invested
         

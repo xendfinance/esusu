@@ -26,6 +26,7 @@ interface IEsusuStorage {
     function CalculateMemberWithdrawalTime(uint cycleId, address member) external view returns(uint);
     function GetTotalDeposits() external view returns (uint);
     function GetEsusuCycleState(uint esusuCycleId) external view returns (uint);
+    function GetTotalMembersInCycle(uint esusuCycleId)external view returns(uint TotalMembers);
     
     /* Setters - only owner or service contract can call */
 

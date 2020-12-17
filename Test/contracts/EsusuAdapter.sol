@@ -88,7 +88,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
 
     IDaiLendingService _iDaiLendingService;
     IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    IYDaiToken _yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
+    IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
     IEsusuStorage _esusuStorage;
     address  _delegateContract;
     bool _isActive = true;

@@ -17,6 +17,8 @@ import "./SafeMath.sol";
     6. We should be able to stop reward distribution by the owner
     7. This contract can be replaced at anytime and updated in calling contracts 
 
+    TODO: Add tracker to know at what treshold a user invested so as to ensure we paid the exact amount
+
 */
 contract RewardConfig is Ownable {
     
