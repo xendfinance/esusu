@@ -42,7 +42,6 @@ module.exports = function (deployer) {
 
      await deployer.deploy(EsusuAdapterContract,
                             EsusuServiceContract.address,
-                            SavingsConfigContract.address,
                             GroupsContract.address,
                             EsusuStorageContract.address);
 

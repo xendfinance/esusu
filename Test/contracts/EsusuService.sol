@@ -10,8 +10,6 @@ contract EsusuService{
     EsusuAdapter _esusuAdapter;
     EsusuAdapterWithdrawalDelegate _esusuAdapterWithdrawalDelegate;
     
-    mapping(address => uint) userDaiDeposits;   
-
     constructor() public {
         _owner = msg.sender;
     }
@@ -28,7 +26,7 @@ contract EsusuService{
         _esusuAdapterWithdrawalDelegate = EsusuAdapterWithdrawalDelegate(delegateAddress);   
     }
     
-    function GetGroupInformationByName(string calldata name) external view returns (uint groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
+    function GetGroupInformationByName(string calldata name) external view returns (uint256 groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
         
 
         return _esusuAdapter.GetGroupInformationByName(name);
@@ -45,7 +43,7 @@ contract EsusuService{
            
     }
     
-    function CreateEsusu(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds,uint maxMembers) external {
+    function CreateEsusu(uint256 groupId, uint256 depositAmount, uint256 payoutIntervalSeconds,uint256 startTimeInSeconds,uint256 maxMembers) external {
         
         _esusuAdapter.CreateEsusu(groupId,depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
     }
@@ -53,48 +51,48 @@ contract EsusuService{
     /*
         NOTE: member must approve _esusuAdapter to transfer deposit amount on his/her behalf
     */
-    function JoinEsusu(uint esusuCycleId, address member) external {
-        _esusuAdapter.JoinEsusu(esusuCycleId,member);
+    function JoinEsusu(uint256 esusuCycleId, address member) external {
+        _esusuAdapter.JoinEsusu(esusuCycleId,msg.sender);
     }
     
     
     /*
         This function returns information about a member in an esusu Cycle 
     */
-    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) 
-                                external view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, 
-                                uint TotalPayoutReceivedInCycle, uint memberPosition){
+    function GetMemberCycleInfo(address memberAddress, uint256 esusuCycleId) 
+                                external view returns(uint256 CycleId, address MemberId, uint256 TotalAmountDepositedInCycle, 
+                                uint256 TotalPayoutReceivedInCycle, uint256 memberPosition){
         
         return _esusuAdapter.GetMemberCycleInfo(memberAddress,esusuCycleId);
     }
     
-     function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
-                                                            uint PayoutIntervalSeconds, uint CycleState, 
-                                                            uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
-                                                            uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
-                                                            uint TotalBeneficiaries, uint MaxMembers){
+     function GetEsusuCycle(uint256 esusuCycleId) external view returns(uint256 CycleId, uint256 DepositAmount, 
+                                                            uint256 PayoutIntervalSeconds, uint256 CycleState, 
+                                                            uint256 TotalMembers, uint256 TotalAmountDeposited, uint256 TotalShares, 
+                                                            uint256 TotalCycleDurationInSeconds, uint256 TotalCapitalWithdrawn, uint256 CycleStartTimeInSeconds,
+                                                            uint256 TotalBeneficiaries, uint256 MaxMembers){
     
         return _esusuAdapter.GetEsusuCycle(esusuCycleId);                                                        
     }
     
-    function StartEsusuCycle(uint esusuCycleId) external {
+    function StartEsusuCycle(uint256 esusuCycleId) external {
         _esusuAdapter.StartEsusuCycle(esusuCycleId);
     }
     
-    function WithdrawROIFromEsusuCycle(uint esusuCycleId) external{
+    function WithdrawROIFromEsusuCycle(uint256 esusuCycleId) external{
         _esusuAdapterWithdrawalDelegate.WithdrawROIFromEsusuCycle(esusuCycleId,msg.sender);
     }
     
-    function WithdrawCapitalFromEsusuCycle(uint esusuCycleId) external{
+    function WithdrawCapitalFromEsusuCycle(uint256 esusuCycleId) external{
         _esusuAdapterWithdrawalDelegate.WithdrawCapitalFromEsusuCycle(esusuCycleId,msg.sender);
     }
     
-    function IsMemberEligibleToWithdrawROI(uint esusuCycleId, address member) external view returns(bool){
-        _esusuAdapterWithdrawalDelegate.IsMemberEligibleToWithdrawROI(esusuCycleId,member);
+    function IsMemberEligibleToWithdrawROI(uint256 esusuCycleId, address member) external view returns(bool){
+        return _esusuAdapterWithdrawalDelegate.IsMemberEligibleToWithdrawROI(esusuCycleId,member);
     }
     
-    function IsMemberEligibleToWithdrawCapital(uint esusuCycleId, address member) external view returns(bool){
-        _esusuAdapterWithdrawalDelegate.IsMemberEligibleToWithdrawCapital(esusuCycleId,member);
+    function IsMemberEligibleToWithdrawCapital(uint256 esusuCycleId, address member) external view returns(bool){
+        return _esusuAdapterWithdrawalDelegate.IsMemberEligibleToWithdrawCapital(esusuCycleId,member);
     }
     
     function GetCurrentEsusuCycleId() external view returns(uint){

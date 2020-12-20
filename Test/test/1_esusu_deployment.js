@@ -27,7 +27,8 @@
     const Web3 = require('web3');
     const { assert } = require('console');
     const web3 = new Web3("HTTP://127.0.0.1:8545");
-    
+    const utils = require("./helpers/Utils")
+
     const DaiLendingAdapterContract = artifacts.require("DaiLendingAdapter");
     const DaiLendingServiceContract = artifacts.require("DaiLendingService");
     const GroupsContract = artifacts.require('Groups');
@@ -787,10 +788,17 @@
             
             //  The code below should fail
             
-            var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
+            // var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
 
-            console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+            // console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
 
+            try {
+                await utils.shouldThrow(esusuServiceContract.GetGroupInformationByName(groupName));
+
+            } catch (error) {
+                assert(error, " Contract is depricated");
+                console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+            }
         });
 
     });

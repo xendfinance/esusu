@@ -1,4 +1,6 @@
-pragma solidity ^0.6.6;
+// SPDX-License-Identifier: MIT
+
+pragma solidity >=0.4.22 <0.8.0;
 
 /*
  * Ownable
@@ -6,7 +8,7 @@ pragma solidity ^0.6.6;
  * Base contract with an owner.
  * Provides onlyOwner modifier, which prevents function from running if it is called by anyone other than the owner.
  */
-contract Ownable {
+contract OwnableService {
     address payable public owner;
     address payable public serviceContract;
 
@@ -29,17 +31,15 @@ contract Ownable {
     }
 
     function transferOwnership(address payable newOwner) public onlyOwner {
-        if (newOwner != address(0)) {
-            owner = newOwner;
-        }
+        require(newOwner != address(0), "address cannot be zero");
+        owner = newOwner;
     }
 
     function transferContractOwnership(address payable newServiceContract)
         public
         onlyOwnerAndServiceContract
     {
-        if (newServiceContract != address(0)) {
-            serviceContract = newServiceContract;
-        }
+        require(newServiceContract != address(0), "address cannot be zero");
+        serviceContract = newServiceContract;
     }
 }
