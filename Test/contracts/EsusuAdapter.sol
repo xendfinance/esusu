@@ -23,10 +23,10 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     using SafeERC20 for IYDaiToken; 
 
     /*
-        Events to emit 
-        1. Creation of Esusu Cycle 
-        2. Joining of Esusu Cycle 
-        3. Starting of Esusu Cycle 
+        Events to emit
+        1. Creation of Esusu Cycle
+        2. Joining of Esusu Cycle
+        3. Starting of Esusu Cycle
         4. Withdrawal of ROI
         5. Withdrawal of Capital
     */
@@ -41,7 +41,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         string currencySymbol,
         uint256 cycleState
     );
-    
+
     event DepricateContractEvent(
         
         uint256 date,
@@ -66,31 +66,27 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         uint256 totalShares,
         uint256 indexed cycleId
     );
-    
 
-    
     /*  Enum definitions */
-    enum CurrencyEnum{
-        Dai
-    }
-    
-    enum CycleStateEnum{
-        Idle,               // Cycle has just been created and members can join in this state
-        Active,             // Cycle has started and members can take their ROI
-        Expired,            // Cycle Duration has elapsed and members can withdraw their capital as well as ROI
-        Inactive            // Total beneficiaries is equal to Total members, so all members have withdrawn their Capital and ROI 
+    enum CurrencyEnum {Dai}
+
+    enum CycleStateEnum {
+        Idle, // Cycle has just been created and members can join in this state
+        Active, // Cycle has started and members can take their ROI
+        Expired, // Cycle Duration has elapsed and members can withdraw their capital as well as ROI
+        Inactive // Total beneficiaries is equal to Total members, so all members have withdrawn their Capital and ROI
     }
 
     
     //  Member variables
     ISavingsConfig _savingsConfigContract;
-    IGroups _groupsContract;
+    IGroups immutable _groupsContract;
 
     IDaiLendingService _iDaiLendingService;
-    IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-    IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+    IDaiToken immutable _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+    IYDaiToken immutable _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
     IEsusuStorage _esusuStorage;
-    address  _delegateContract;
+    address _delegateContract;
     bool _isActive = true;
     
 
@@ -101,17 +97,26 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         _esusuStorage = IEsusuStorage(esusuStorageContract);
     }
 
-    
-    function UpdateDaiLendingService(address daiLendingServiceContractAddress) onlyOwner active external {
-        _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
+    function UpdateDaiLendingService(address daiLendingServiceContractAddress)
+        external
+        onlyOwner
+        active
+    {
+        _iDaiLendingService = IDaiLendingService(
+            daiLendingServiceContractAddress
+        );
     }
-    
-    function UpdateEsusuAdapterWithdrawalDelegate(address delegateContract) onlyOwner active external {
+
+    function UpdateEsusuAdapterWithdrawalDelegate(address delegateContract)
+        external
+        onlyOwner
+        active
+    {
         _delegateContract = delegateContract;
     }
-    
+
     /*
-        NOTE: startTimeInSeconds is the time at which when elapsed, any one can start the cycle 
+        NOTE: startTimeInSeconds is the time at which when elapsed, any one can start the cycle
         -   Creates a new EsusuCycle
         -   Esusu Cycle can only be created by the owner of the group
     */
@@ -131,16 +136,16 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         emit CreateEsusuCycleEvent(now, currentEsusuCycleId, depositAmount, owner, payoutIntervalSeconds,CurrencyEnum.Dai,"Dai Stablecoin",_esusuStorage.GetEsusuCycleState(currentEsusuCycleId));
         
     }
-    
-    //  Join a particular Esusu Cycle 
+
+    //  Join a particular Esusu Cycle
     /*
         - Check if the cycle ID is valid
         - Check if the cycle is in Idle state, that is the only state a member can join
         - Check if member is already in Cycle
         - Ensure member has approved this contract to transfer the token on his/her behalf
         - If member has enough balance, transfer the tokens to this contract else bounce
-        - Increment the total deposited amount in this cycle and total deposited amount for the member cycle struct 
-        - Increment the total number of Members that have joined this cycle 
+        - Increment the total deposited amount in this cycle and total deposited amount for the member cycle struct
+        - Increment the total number of Members that have joined this cycle
     */
     
     function JoinEsusu(uint256 esusuCycleId, address member) external onlyOwnerAndServiceContract active {
@@ -148,8 +153,11 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         uint256 currentEsusuCycleId = _esusuStorage.GetEsusuCycleId();
         
         //  Check if the cycle ID is valid
-        require(esusuCycleId > 0 && esusuCycleId <= currentEsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
+        require(
+            esusuCycleId > 0 && esusuCycleId <= currentEsusuCycleId,
+            "Cycle ID must be within valid EsusuCycleId range"
+        );
+
         //  Get the Esusu Cycle struct
         
         (uint256 CycleId, uint256 DepositAmount, uint256 CycleState,uint256 TotalMembers,uint256 MaxMembers) = _esusuStorage.GetEsusuCycleBasicInformation(esusuCycleId);
@@ -182,14 +190,21 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         
         //  Increase TotalMembers count by 1
         _esusuStorage.IncreaseTotalMembersInCycle(esusuCycleId);
-        
+        //  Create the position of the member in the cycle
         _esusuStorage.CreateMemberPositionMapping(CycleId, member);
+        //  Create mapping to track the Cycles a member belongs to by index and by ID
+        _esusuStorage.CreateMemberToCycleIndexToCycleIDMapping(member, CycleId);
 
-        //  emit event 
-        emit JoinEsusuCycleEvent(now, member,TotalMembers, totalAmountDeposited,esusuCycleId);
+        //  emit event
+        emit JoinEsusuCycleEvent(
+            now,
+            member,
+            TotalMembers,
+            totalAmountDeposited,
+            esusuCycleId
+        );
     }
 
-    
     /*
         - Check if the Id is a valid ID
         - Check if the cycle is in Idle State
@@ -198,7 +213,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         - Set the Cycle start time to now 
         - Take everyones deposited DAI from this Esusu Cycle and then invest through Yearn 
         - Track the yDai shares that belong to this cycle using the derived equation below for save/investment operation
-            - yDaiSharesPerCycle = Change in yDaiSharesForContract + Current yDai Shares in the cycle 
+            - yDaiSharesPerCycle = Change in yDaiSharesForContract + Current yDai Shares in the cycle
             - Change in yDaiSharesForContract = yDai.balanceOf(address(this) after save operation - yDai.balanceOf(address(this) after before operation
     */
     
@@ -222,15 +237,14 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         require(esusuCycleId != 0 && esusuCycleId <= currentEsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         
 
-        require(CycleState == uint(CycleStateEnum.Idle), "Cycle can only be started when in Idle state");
-        
-        require(now > _esusuStorage.GetEsusuCycleStartTime(esusuCycleId), "Cycle can only be started when start time has elapsed");
-        
+        require(
+            now > _esusuStorage.GetEsusuCycleStartTime(esusuCycleId),
+            "Cycle can only be started when start time has elapsed"
+        );
 
         //  Calculate Cycle LifeTime in seconds
         uint256 toalCycleDuration = EsusuCyclePayoutInterval * TotalMembers;
 
-        
         //  Get all the dai deposited for this cycle
         uint256 esusuCycleBalance = _esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId);
         
@@ -238,15 +252,16 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         uint256 yDaiSharesForContractBeforeSave = _yDai.balanceOf(address(this));
         
         //  Invest the dai in Yearn Finance using Dai Lending Service.
-        
+
         //  NOTE: yDai will be sent to this contract
         //  Transfer dai from this contract to dai lending adapter and then call a new save function that will not use transferFrom internally
-        //  Approve the daiLendingAdapter so it can spend our Dai on our behalf 
-        address daiLendingAdapterContractAddress = _iDaiLendingService.GetDaiLendingAdapterAddress();
-        _dai.approve(daiLendingAdapterContractAddress,esusuCycleBalance);
-        
+        //  Approve the daiLendingAdapter so it can spend our Dai on our behalf
+        address daiLendingAdapterContractAddress = _iDaiLendingService
+            .GetDaiLendingAdapterAddress();
+        _dai.approve(daiLendingAdapterContractAddress, esusuCycleBalance);
+
         _iDaiLendingService.save(esusuCycleBalance);
-        
+
         //  Get the balance of yDaiSharesForContract after save operation
         uint256 yDaiSharesForContractAfterSave = _yDai.balanceOf(address(this));
         
@@ -257,13 +272,24 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         //  Increase TotalDeposits made to this contract 
 
         _esusuStorage.IncreaseTotalDeposits(esusuCycleBalance);
-        
-        //  Update Esusu Cycle State, total cycle duration, total shares  and  cycle start time, 
-        _esusuStorage.UpdateEsusuCycleDuringStart(CycleId,uint(CycleStateEnum.Active),toalCycleDuration,totalShares,now);
-        
-        //  emit event 
-        emit StartEsusuCycleEvent(now,esusuCycleBalance, toalCycleDuration,
-                                    totalShares,esusuCycleId);
+
+        //  Update Esusu Cycle State, total cycle duration, total shares  and  cycle start time,
+        _esusuStorage.UpdateEsusuCycleDuringStart(
+            CycleId,
+            uint256(CycleStateEnum.Active),
+            toalCycleDuration,
+            totalShares,
+            now
+        );
+
+        //  emit event
+        emit StartEsusuCycleEvent(
+            now,
+            esusuCycleBalance,
+            toalCycleDuration,
+            totalShares,
+            esusuCycleId
+        );
     }
     
     
@@ -280,17 +306,23 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
                                                             uint256 TotalBeneficiaries, uint256 MaxMembers){
         
         return _esusuStorage.GetEsusuCycle(esusuCycleId);
-        
     }
-    
-    
 
-    
-    function GetDaiBalance(address member) active external view returns(uint){
+    function GetDaiBalance(address member)
+        external
+        view
+        active
+        returns (uint256)
+    {
         return _dai.balanceOf(member);
     }
-    
-    function GetYDaiBalance(address member) active external view returns(uint){
+
+    function GetYDaiBalance(address member)
+        external
+        view
+        active
+        returns (uint256)
+    {
         return _yDai.balanceOf(member);
     }
     
@@ -298,9 +330,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     
     function GetTotalDeposits() active external view returns(uint)  {
         return _esusuStorage.GetTotalDeposits();
-    } 
-    
-    
+    }
 
     
     function GetCurrentEsusuCycleId() active external view returns(uint){
@@ -322,7 +352,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         
         return _esusuStorage.GetMemberWithdrawnCapitalInEsusuCycle(esusuCycleId, memberAddress) > 0;
     }
-    
+
     /*
         - Get the group index by name
         - Get the group information by index
@@ -336,8 +366,8 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
 
         return _groupsContract.getGroupByIndex(index);
     }
-    
-        /*
+
+    /*
         - Get the group information by Id
     */
     function GetGroupInformationById(uint256 id) active public view returns (uint256 groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
@@ -346,9 +376,9 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
 
         return _groupsContract.getGroupById(id);
     }
-    
+
     /*
-        - Creates the group 
+        - Creates the group
         - returns the ID and other information
     */
     function CreateGroup(string calldata name, string calldata symbol, address groupCreator) active external {
@@ -360,11 +390,12 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
     function TransferYDaiSharesToWithdrawalDelegate(uint256 amount) external active onlyOwnerAndDelegateContract {
         
         _yDai.safeTransfer(_delegateContract, amount);
-
     }
 
-
-    function DepricateContract(address newEsusuAdapterContract, string calldata reason) external onlyOwner{
+    function DepricateContract(
+        address newEsusuAdapterContract,
+        string calldata reason
+    ) external onlyOwner {
         //  set _isActive to false
         _isActive = false;
         
@@ -376,7 +407,7 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         DepricateContractEvent(now, owner, reason, yDaiSharesBalance);
 
     }
-    
+
     modifier onlyOwnerAndDelegateContract() {
         require(
             msg.sender == owner || msg.sender == _delegateContract,
@@ -389,6 +420,4 @@ contract EsusuAdapter is OwnableService, ISavingsConfigSchema {
         require(_isActive, "This contract is depricated, use new version of contract");
         _;
     }
-    
-
 }

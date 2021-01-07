@@ -185,8 +185,8 @@ contract DaiLendingAdapter is OwnableService{
         uint256 amount,
         address owner,
         uint256 sharesAmount
-    ) public 
-    onlyOwnerAndServiceContract 
+    ) public
+    onlyOwnerAndServiceContract
     {
         //  To withdraw our DAI amount, the amount argument is in DAI but the withdraw function of the yDAI expects amount in yDAI token
 

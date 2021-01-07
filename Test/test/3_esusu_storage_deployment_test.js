@@ -1,5 +1,5 @@
     /**
-     *  @todo    
+     *  @todo
      *  Ensure to install web3 before running this test -> npm install web3
      *  Tests to write:
      *  1.  Get Esusu ID                            -   Done
@@ -8,9 +8,9 @@
      *  4.  Check if member is in cycle
      *  5.  IncreaseTotalAmountDepositedInCycle     -   Done
      *  6.  CreateMemberAddressToMemberCycleMapping -   Done
-     *  7.  IncreaseTotalMembersInCycle             -   Done           
+     *  7.  IncreaseTotalMembersInCycle             -   Done
      *  8.  CreateMemberPositionMapping             -   Done
-     *  9.  IncreaseTotalDeposits                   -   Done   
+     *  9.  IncreaseTotalDeposits                   -   Done
      *  10. UpdateEsusuCycleDuringStart             -   Done
      *  11. UpdateEsusuCycleState                   -   Done
      *  12. CreateMemberCapitalMapping              -   Done
@@ -28,11 +28,11 @@
     const { Contract } = require('web3-eth-contract');
     const { deepStrictEqual } = require('assert');
     const web3 = new Web3("HTTP://127.0.0.1:8545");
-    
+
 
     const EsusuStorageContract = artifacts.require('EsusuStorage');
 
-    var account1;   
+    var account1;
     var account2;
     var account3;
 
@@ -52,11 +52,11 @@
 
         before(async () =>{
             esusuStorageContract = await EsusuStorageContract.deployed();
-    
+
                         //  Get the addresses and Balances of at least 2 accounts to be used in the test
             //  Send DAI to the addresses
             web3.eth.getAccounts().then(function(accounts){
-    
+
                 account1 = accounts[0];
                 account2 = accounts[1];
                 account3 = accounts[2];
@@ -65,26 +65,26 @@
         });
 
         var groupId = "1";
-        var depositAmount = "2000000000000000000000";   //2,000 DAI 10000000000000000000000 
+        var depositAmount = "2000000000000000000000";   //2,000 DAI 10000000000000000000000
         var payoutIntervalSeconds = "30";  // 2 minutes
         var startTimeInSeconds = Math.floor((Date.now() + 120)/1000); // starts 2 minutes afer current time
         var maxMembers = "2";
         var currentEsusuCycleId = null;
 
         it('Esusu Storage: Should Get The Current Esusu Cycle ID',async () => {
-        
+
             var result = await esusuStorageContract.GetEsusuCycleId();
-    
+
             assert(BigInt(result).toString() === "0");
 
             console.log(`Esusu Storage: Current Cycle ID ${BigInt(result).toString()}`);
-    
+
         });
 
         it('Esusu Storage: Should Increase The Esusu Cycle ID By 1',async () => {
-        
+
             await esusuStorageContract.IncrementEsusuCycleId();
-    
+
             var result = await esusuStorageContract.GetEsusuCycleId();
 
             currentEsusuCycleId = BigInt(result);
@@ -92,14 +92,14 @@
             assert(BigInt(result).toString() === "1");
 
             console.log(`Esusu Storage: Current Cycle ID ${BigInt(result).toString()}`);
-    
+
         });
 
         it('Esusu Storage: Should Create Esusu Cycle Mapping ',async () => {
-             
+
             // CreateEsusuCycleMapping(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds, address owner, uint maxMembers)
             await esusuStorageContract.CreateEsusuCycleMapping(groupId, depositAmount,payoutIntervalSeconds,startTimeInSeconds,account1,maxMembers);
-    
+
             currentEsusuCycleId = BigInt(await esusuStorageContract.GetEsusuCycleId());
 
             var result = await esusuStorageContract.GetEsusuCycle(currentEsusuCycleId.toString());
@@ -115,16 +115,16 @@
 
 
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
 
-    
+
         });
 
         it('Esusu Storage: Should Increase Total Amount Deposited In Cycle  ',async () => {
-             
+
             await esusuStorageContract.IncreaseTotalAmountDepositedInCycle(currentEsusuCycleId.toString(), depositAmount);
 
 
@@ -132,16 +132,16 @@
 
             assert(BigInt(result[5]).toString() === "2000000000000000000000");
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
-    
+
         });
 
         //  This ensures that a member is also added to membercyclemapping for tracking the cycles members belong to
         it('Esusu Storage: Should Create MemberAddressToMemberCycleMapping  ',async () => {
-             
+
             await esusuStorageContract.CreateMemberAddressToMemberCycleMapping(account1,currentEsusuCycleId.toString());
 
             var result = await esusuStorageContract.GetMemberCycleInfo(account1,currentEsusuCycleId.toString());
@@ -150,11 +150,11 @@
             assert(BigInt(result[4]).toString() === "0");   //  This will always be 0. It can only increase when a member joins a cycle.
 
             console.log(`CycleId: ${BigInt(result[0])}, MemberId: ${result[1]},TotalAmountDepositedInCycle: ${BigInt(result[2])}, TotalPayoutReceivedInCycle: ${BigInt(result[3])}, MemberPosition: ${BigInt(result[4])} `);
-    
+
         });
 
         it('Esusu Storage: Should Increase TotalMembers In An Esusu Cycle  ',async () => {
-             
+
             await esusuStorageContract.IncreaseTotalMembersInCycle(currentEsusuCycleId.toString());
 
             var result = await esusuStorageContract.GetEsusuCycleBasicInformation(currentEsusuCycleId.toString());
@@ -165,7 +165,7 @@
         });
 
         it('Esusu Storage: Should Create Member Position Mapping  ',async () => {
-             
+
             await esusuStorageContract.CreateMemberPositionMapping(currentEsusuCycleId.toString(), account1);
 
             var result = await esusuStorageContract.GetMemberCycleInfo(account1, currentEsusuCycleId.toString());
@@ -178,7 +178,7 @@
         });
 
         it('Esusu Storage: Should Increase Total Deposits ',async () => {
-             
+
             await esusuStorageContract.IncreaseTotalDeposits(depositAmount);
 
             var totalDepositsMadeInStorageContract = await esusuStorageContract.GetTotalDeposits();
@@ -187,63 +187,63 @@
 
             assert(BigInt(totalDepositsMadeInStorageContract).toString() === "2000000000000000000000");
 
-      
+
         });
 
         it('Esusu Storage: Should Update Esusu Cycle During Start ',async () => {
-             
+
             await esusuStorageContract.UpdateEsusuCycleDuringStart(currentEsusuCycleId.toString(), "1","360","345000000000000000000", "1603958687");
             var result = await esusuStorageContract.GetEsusuCycle(currentEsusuCycleId.toString());
 
             assert(BigInt(result[6]).toString() === "345000000000000000000");
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
-  
+
         });
 
-        
+
         it('Esusu Storage: Should Update Esusu Cycle State ',async () => {
-             
+
             //  Update cycle state here with one value
             await esusuStorageContract.UpdateEsusuCycleDuringStart(currentEsusuCycleId.toString(), "1","360","345000000000000000000", "1603958687");
 
             //  Update the cycle state with the function we are testin
             await esusuStorageContract.UpdateEsusuCycleState(currentEsusuCycleId.toString(), "2");
-            
+
             var result = await esusuStorageContract.GetEsusuCycle(currentEsusuCycleId.toString());
 
             assert(BigInt(result[3]).toString() === "2");
 
 
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
         });
 
         it('Esusu Storage: Should Create Member Capital Mapping  ',async () => {
-             
+
             await esusuStorageContract.CreateMemberCapitalMapping(currentEsusuCycleId.toString(), account1);
 
             var capitalWithdrawn = await esusuStorageContract.GetMemberWithdrawnCapitalInEsusuCycle(currentEsusuCycleId.toString(),account1);
-            
+
             console.log(`Capital Withdrawn: ${capitalWithdrawn}`);
 
             //  capital withdrawn is 2000000000000000000000 because I have called CreateMemberCapitalMapping before calling GetMemberWithdrawnCapitalInEsusuCycle
-            //  creating capital mapping for a member means he has withdrawn the deposit amount of that cycle  
+            //  creating capital mapping for a member means he has withdrawn the deposit amount of that cycle
             assert(BigInt(capitalWithdrawn).toString() === "2000000000000000000000");
 
         });
 
         it('Esusu Storage: Should Update Esusu Cycle During Capital Withdrawal ',async () => {
-             
-            
+
+
             await esusuStorageContract.UpdateEsusuCycleDuringCapitalWithdrawal(currentEsusuCycleId.toString(), "880000000000000000000","2000000000000000000000");
-            
+
             var result = await esusuStorageContract.GetEsusuCycle(currentEsusuCycleId.toString());
 
 
@@ -251,18 +251,18 @@
 
 
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
 
         });
 
         it('Esusu Storage: Should Update Esusu Cycle During ROI Withdrawal',async () => {
-             
-            
+
+
             await esusuStorageContract.UpdateEsusuCycleDuringROIWithdrawal(currentEsusuCycleId.toString(),"4560000000006540000000", "2");
-            
+
             var totalBeneficiaries = await esusuStorageContract.GetEsusuCycleTotalBeneficiaries(currentEsusuCycleId.toString());
 
             // console.log(`Total Beneficiaries: ${totalBeneficiaries}`);
@@ -275,20 +275,20 @@
 
 
 
-            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])}, 
-            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])}, 
+            console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+            CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
         });
 
         it('Esusu Storage: Should Calculate Member WithdrawalTime',async () => {
-             
-            
+
+
             //  1. We need to create esusu cycle mapping
             await esusuStorageContract.CreateEsusuCycleMapping(groupId, depositAmount,payoutIntervalSeconds,startTimeInSeconds,account1,maxMembers);
 
             var cycleId = await esusuStorageContract.GetEsusuCycleId();
-    
+
             console.log(`Current Cycle ID: ${BigInt(cycleId).toString()}`);
             console.log(`Current Cycle ID - Variable: ${currentEsusuCycleId}`);
 
@@ -297,7 +297,7 @@
 
             //  3. We need to create member position mapping
             await esusuStorageContract.CreateMemberPositionMapping(cycleId.toString(), account1);
-            
+
 
             //  4. Get member position
             var memberPosistion = await esusuStorageContract.GetMemberCycleInfo(account1, cycleId.toString());
@@ -305,14 +305,14 @@
             var expectedWithdrawalTime = startTimeInSeconds + (Number(BigInt(memberPosistion[4]).toString()) * Number(payoutIntervalSeconds));
             console.log(`Expected Withdrawal Time: ${expectedWithdrawalTime}`);
 
-            
+
             var withdrawalTime = await esusuStorageContract.CalculateMemberWithdrawalTime(cycleId.toString(), account1);
 
             console.log(`Withdrawal Time: ${withdrawalTime}`);
 
             assert(expectedWithdrawalTime.toString() === Number(withdrawalTime).toString());
         });
-        
 
-        
+
+
     })

@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.8.0;
 
+pragma solidity ^0.6.0;
+import "./Context.sol";
 import "./ERC20Pausable.sol";
 import "./ERC20Burnable.sol";
 import "./ERC20.sol";
 import "./SafeMath.sol";
-import "./Context.sol";
 
 contract MintAccessor {
     address payable public owner;
@@ -59,7 +59,7 @@ contract XendToken is ERC20Pausable {
         virtual
         onlyMinter
     {
-        _mint(recipient, amount);
+        _transfer(address(this), recipient, amount);
     }
 
     function withdraw() public virtual onlyOwner {

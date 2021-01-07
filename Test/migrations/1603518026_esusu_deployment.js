@@ -13,7 +13,7 @@ const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWi
 const EsusuStorageContract = artifacts.require('EsusuStorage');
 
 module.exports = function (deployer) {
-  
+
   console.log("********************** Running Esusu Migrations *****************************");
 
   deployer.then(async () => {
@@ -32,12 +32,12 @@ module.exports = function (deployer) {
      await deployer.deploy(XendTokenContract, "Xend Token", "$XEND","18","200000000000000000000000000");
 
      await deployer.deploy(EsusuServiceContract);
-    
+
      await deployer.deploy(RewardConfigContract,EsusuServiceContract.address, GroupsContract.address);
-    
+
      await deployer.deploy(EsusuStorageContract);
 
-    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract, 
+    //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
     //                 string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract
 
      await deployer.deploy(EsusuAdapterContract,
@@ -46,7 +46,7 @@ module.exports = function (deployer) {
                             EsusuStorageContract.address);
 
       await deployer.deploy(EsusuAdapterWithdrawalDelegateContract,
-                              EsusuServiceContract.address, 
+                              EsusuServiceContract.address,
                               EsusuStorageContract.address,
                               EsusuAdapterContract.address,
                               "esusufee",
@@ -54,7 +54,7 @@ module.exports = function (deployer) {
                               RewardConfigContract.address,
                               XendTokenContract.address,
                               SavingsConfigContract.address);
-                              
+
      console.log("Groups Contract address: "+GroupsContract.address);
 
      console.log("Treasury Contract address: "+TreasuryContract.address);
@@ -77,8 +77,28 @@ module.exports = function (deployer) {
 
      console.log("EsusuAdapter Contract address: "+EsusuAdapterContract.address );
 
+     let daiLendingAdapterContract = null;
+     let daiLendingServiceContract = null;
+     let savingsConfigContract = null;
+     let esusuAdapterContract = null;
+     let esusuServiceContract = null;
+     let groupsContract = null;
+     let xendTokenContract = null;
+     let esusuAdapterWithdrawalDelegateContract = null;
+     let esusuStorageContract = null;
+     let rewardConfigContract = null;
+
+     savingsConfigContract = await SavingsConfigContract.deployed();
+     daiLendingAdapterContract = await DaiLendingAdapterContract.deployed();
+     daiLendingServiceContract = await DaiLendingServiceContract.deployed();
+     esusuAdapterContract = await EsusuAdapterContract.deployed();
+     esusuServiceContract = await EsusuServiceContract.deployed();
+     groupsContract = await GroupsContract.deployed();
+     xendTokenContract = await XendTokenContract.deployed();
+     esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
+     esusuStorageContract = await EsusuStorageContract.deployed();
+     rewardConfigContract = await RewardConfigContract.deployed();
+ 
   })
-  
+
 };
-
-

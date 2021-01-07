@@ -7,35 +7,38 @@ import "./SafeMath.sol";
 
 /*
     @Brief: This contract should calculate the Xend Token reward for users. This contract implements the reward system as described in Litepaper but this is
-    much more detailed 
-    
-    1. We must get the Current Threshold level which is determined by the total amount deposited on the different smart contracts 
+    much more detailed
+
+    1. We must get the Current Threshold level which is determined by the total amount deposited on the different smart contracts
     2. They perform one or more of the following operations (Individual savings, cooperative savings, esusu)
     3. The users must meet the timelock conditions per operation to receive reward for that condition
-    4. Create timelock to Category to CategoryRewardFactor Mapping 
+    4. Create timelock to Category to CategoryRewardFactor Mapping
     5. Once a new threshold level is reached, we will add it to the threshold level mapping with maximum Xend Tokens to be distributed in that level
     6. We should be able to stop reward distribution by the owner
-    7. This contract can be replaced at anytime and updated in calling contracts 
+    7. This contract can be replaced at anytime and updated in calling contracts
 
     TODO: Add tracker to know at what treshold a user invested so as to ensure we paid the exact amount
 
 */
 contract RewardConfig is Ownable {
-    
+
     using SafeMath for uint256;
 
-    
+
     constructor(address esusuServiceContract, address groupServiceContract) public{
-        
+
         iEsusuService = IEsusuService(esusuServiceContract);
-        
+
         //  NOTE: The groups contracts holds overall deposits for all savings , i.e Individual savings and groups savings
         savingsStorage = IGroups(groupServiceContract);
     }
-    
-    IEsusuService iEsusuService;
-    IGroups savingsStorage;
-    address daiTokenAddress = 0x6B175474E89094C44Da98b954EedeAC495271d0F;   
+
+    IEsusuService immutable iEsusuService;
+    IGroups immutable savingsStorage;
+    address daiTokenAddress = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+
+
+    uint CurrentThresholdLevel;                 //
 
         
     mapping(uint256 => uint)   DurationToRewardFactorMapping;
@@ -55,14 +58,14 @@ contract RewardConfig is Ownable {
     uint256 MinimumNumberOfSeconds = 2592000;      //  This determines whether we are checking time level by days, weeks, months or years. It is 30 days(1 month) in seconds by default
     uint256 MaximumTimeLevel;                      //  This determines how many levels can be derived based on the MinimumNumberOfSeconds that has been set
     bool RewardActive;
-    
-    
-    
-    /*  
+
+
+
+    /*
         -   Sets the inital threshold value in USD (value in 1e18)
         -   Sets XendToken reward at the initial threshold (value in 1e18)
         -   Sets DepreciationFactor
-        
+
     */
     function SetRewardParams(uint256 thresholdValue, uint256 xendTokenReward, uint256 depreciationFactor, 
                                 uint256 savingsCategoryRewardFactor, uint256 groupCategoryRewardFactor, 
@@ -78,9 +81,9 @@ contract RewardConfig is Ownable {
         PercentageRewardFactorPerTimeLevel = percentageRewardFactorPerTimeLevel;
         MinimumNumberOfSeconds = minimumNumberOfSeconds;
         MaximumTimeLevel = maximumTimeLevel;
-       
+
     }
-    
+
     /*
         This function calculates XTr for individual savings based on the total cycle time and amountDeposited
     */
@@ -101,7 +104,7 @@ contract RewardConfig is Ownable {
         
         return individualSavingsReward;
     }
-    
+
     /*
         This function calculates XTr for group or cooperative or Group savings based on the total cycle time and amountDeposited
     */
@@ -121,7 +124,7 @@ contract RewardConfig is Ownable {
         groupSavingsReward = XTr.mul(amountDeposited).div(1e36);
         return groupSavingsReward;
     }
-    
+
     /*
         This function calculates XTr for Esusu based on the total cycle time and amountDeposited
     */
@@ -141,7 +144,7 @@ contract RewardConfig is Ownable {
         groupSavingsReward = XTr.mul(amountDeposited).div(1e36);
         return groupSavingsReward;
     }
-    
+
     /*
         -   Get the RewardTimeLevel based on the totalCycleTimeInSeconds
         -   Get the PercentageRewardFactor based on the RewardTimeLevel : NOTE value is in 1e18
@@ -158,11 +161,11 @@ contract RewardConfig is Ownable {
         
         return result;
     }
-    
+
     /*
         1. Get the CurrentThresholdLevel
         2. Get reward factor for current threshold level (XTf) => Xend Token Threshold Per Level / Deposit Threshold for that level in USD
-        
+
     */
     function CalculateRewardFactorForCurrentThresholdLevel() public view returns(uint256 XTf){
         
@@ -173,11 +176,11 @@ contract RewardConfig is Ownable {
         
         return XTf;
     }
-    
 
-    
+
+
     /*
-        - This function gets the total deposits from all XendFinance smart contracts 
+        - This function gets the total deposits from all XendFinance smart contracts
         - tokenAddress is required to get total deposits for the savings storage contract . Esusu service works only with DAI
     */
     function GetTotalDeposits() public view returns(uint256 result){
@@ -201,7 +204,7 @@ contract RewardConfig is Ownable {
          if (level == 0){
              return 1;
          }
-         
+
          return level;
     }
     
@@ -212,13 +215,13 @@ contract RewardConfig is Ownable {
         
         return result;
     }
-    
-    
+
+
     /*
         - Reward time levels determine the amount of reward you will receive based on the total time of the savings cycle
-        - Minimum reward time is 30 days which is 2592000 seconds 
+        - Minimum reward time is 30 days which is 2592000 seconds
         - If the Timelevel is 0, user does not get any Xend Token reward
-        - User gets maximum Xend Token reward from Timelevel 4 since the PercentageRewardFactor will return 100% 
+        - User gets maximum Xend Token reward from Timelevel 4 since the PercentageRewardFactor will return 100%
     */
     
     function GetRewardTimeLevel(uint256 totalCycleTimeInSeconds) public view returns(uint256 level){
@@ -231,7 +234,7 @@ contract RewardConfig is Ownable {
         }
         return level;
     }
-    
+
     /*
         -   This function calculates the percentage of the reward factor per time level.
         -   PercentageRewardFactor = TimeLevel / PercentageRewardFactorPerTimeLevel
@@ -243,11 +246,11 @@ contract RewardConfig is Ownable {
         
         return result;
     }
-    
+
     function SetRewardActive(bool isActive) onlyOwner external {
         RewardActive = isActive;
     }
-    
+
     function GetRewardActive() external view returns(bool rewardActiveStatus){
         return RewardActive;
     }

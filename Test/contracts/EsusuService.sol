@@ -5,7 +5,7 @@ import "./EsusuAdapterWithdrawalDelegate.sol";
 
 
 contract EsusuService{
-    
+
     address _owner;
     EsusuAdapter _esusuAdapter;
     EsusuAdapterWithdrawalDelegate _esusuAdapterWithdrawalDelegate;
@@ -13,17 +13,17 @@ contract EsusuService{
     constructor() public {
         _owner = msg.sender;
     }
-    
+
     function TransferOwnership(address account) onlyOwner() external{
         _owner = account;
     }
-    
+
     function UpdateAdapter(address adapterAddress) onlyOwner() external{
-        _esusuAdapter = EsusuAdapter(adapterAddress);   
+        _esusuAdapter = EsusuAdapter(adapterAddress);
     }
-    
+
     function UpdateAdapterWithdrawalDelegate(address delegateAddress) onlyOwner() external{
-        _esusuAdapterWithdrawalDelegate = EsusuAdapterWithdrawalDelegate(delegateAddress);   
+        _esusuAdapterWithdrawalDelegate = EsusuAdapterWithdrawalDelegate(delegateAddress);
     }
     
     function GetGroupInformationByName(string calldata name) external view returns (uint256 groupId, string memory groupName, string memory groupSymbol, address groupCreatorAddress){
@@ -31,33 +31,33 @@ contract EsusuService{
 
         return _esusuAdapter.GetGroupInformationByName(name);
     }
-    
+
     function GetEsusuAdapterAddress() external view returns (address){
         return address(_esusuAdapter);
     }
-    
-    
+
+
     function CreateGroup(string calldata name, string calldata symbol) external {
-        
+
            _esusuAdapter.CreateGroup(name,symbol,msg.sender);
-           
+
     }
     
     function CreateEsusu(uint256 groupId, uint256 depositAmount, uint256 payoutIntervalSeconds,uint256 startTimeInSeconds,uint256 maxMembers) external {
         
         _esusuAdapter.CreateEsusu(groupId,depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
     }
-    
+
     /*
         NOTE: member must approve _esusuAdapter to transfer deposit amount on his/her behalf
     */
     function JoinEsusu(uint256 esusuCycleId, address member) external {
         _esusuAdapter.JoinEsusu(esusuCycleId,msg.sender);
     }
-    
-    
+
+
     /*
-        This function returns information about a member in an esusu Cycle 
+        This function returns information about a member in an esusu Cycle
     */
     function GetMemberCycleInfo(address memberAddress, uint256 esusuCycleId) 
                                 external view returns(uint256 CycleId, address MemberId, uint256 TotalAmountDepositedInCycle, 
@@ -94,11 +94,11 @@ contract EsusuService{
     function IsMemberEligibleToWithdrawCapital(uint256 esusuCycleId, address member) external view returns(bool){
         return _esusuAdapterWithdrawalDelegate.IsMemberEligibleToWithdrawCapital(esusuCycleId,member);
     }
-    
+
     function GetCurrentEsusuCycleId() external view returns(uint){
         return _esusuAdapter.GetCurrentEsusuCycleId();
     }
-    
+
     function GetTotalDeposits() external view returns(uint)  {
         return _esusuAdapter.GetTotalDeposits();
     }
@@ -106,6 +106,6 @@ contract EsusuService{
         require(_owner == msg.sender, "Only owner can make this call");
         _;
     }
-    
-    
+
+
 }
