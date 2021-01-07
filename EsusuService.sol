@@ -51,7 +51,7 @@ contract EsusuService{
     /*
         NOTE: member must approve _esusuAdapter to transfer deposit amount on his/her behalf
     */
-    function JoinEsusu(uint256 esusuCycleId, address member) external {
+    function JoinEsusu(uint256 esusuCycleId) external {
         _esusuAdapter.JoinEsusu(esusuCycleId,msg.sender);
     }
 

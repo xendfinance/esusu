@@ -274,8 +274,8 @@
             approveDai(esusuAdapterContract.address,account2,approvedAmountToSpend);
 
             //  Account 1 and 2 should Join esusu cycle
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account1);
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account2);
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account1});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account2});
 
             //  get current cycle ID
             currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
@@ -341,6 +341,11 @@
             CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+
+            console.log("List of All Esusu Cycles After Start");
+            console.log(EsusuCycleArray);
 
         });
 
@@ -481,6 +486,12 @@
             CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+
+            console.log("List of All Esusu Cycles After Capital Withdrawal");
+            console.log(EsusuCycleArray)
+
         });
 
 
@@ -534,9 +545,9 @@
             approveDai(esusuAdapterContract.address,account3,approvedAmountToSpend);
 
             //  Account 1, 2 & 3 should Join esusu cycle
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account1, {from: account1});
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account2, {from: account2});
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account3, {from: account3});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account1});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account2});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account3});
 
             //  get current cycle ID
             currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
@@ -773,6 +784,19 @@
 
         });
 
+
+
+        it('EsusuStorage Contract: Should Get the EsusuCycles as list of structs After Updates Have Been Made On Cycles', async () => {
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+      
+            var result = EsusuCycleArray[0];
+            
+            console.log(EsusuCycleArray);
+            console.log(result);
+      
+        });
+
         //  Should depricate contract
         it('EsusuAdapter Contract: Should Depricate Contract', async () => {
 
@@ -801,5 +825,4 @@
                 console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
             }
         });
-
     });
