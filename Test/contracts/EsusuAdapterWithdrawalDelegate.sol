@@ -72,6 +72,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
+        uint256 _feePrecision = 10;  //  This determines the lower limit of the fee to be charged. With precsion of 10, it means our fee can have a precision of 0.1% and above
 
 
         constructor(address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
@@ -89,6 +90,10 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         function UpdateDaiLendingService(address daiLendingServiceContractAddress) active onlyOwner external {
             _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
+        }
+
+        function UpdateFeePrecision(uint256 feePrecision) onlyOwner external{
+            _feePrecision = feePrecision;
         }
 
         /*
@@ -371,9 +376,12 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         //  get feeRate from fee contract
 
         (uint256 minimum, uint256 maximum, uint256 exact, bool applies, RuleDefinition e)  = _savingsConfigContract.getRuleSet(_feeRuleKey);
-        
-        uint256 feeRate = exact;  
-        uint256 fee = Mroi.div(feeRate);
+        /**
+            fee = ( (exact/precision)/(100) * roi)
+         */
+
+        uint256 feeRate = exact; 
+        uint256 fee = Mroi.mul(feeRate).div(_feePrecision.mul(100));
         
         //  Deduct the fee
         uint256 memberROINet = Mroi.sub(fee); 

@@ -44,7 +44,8 @@ contract EsusuService{
     }
     
     function CreateEsusu(uint256 groupId, uint256 depositAmount, uint256 payoutIntervalSeconds,uint256 startTimeInSeconds,uint256 maxMembers) external {
-        
+         
+        require(depositAmount > 0, "Deposit Amount Can't Be Zero");       
         _esusuAdapter.CreateEsusu(groupId,depositAmount,payoutIntervalSeconds,startTimeInSeconds,msg.sender,maxMembers);
     }
 

@@ -311,6 +311,10 @@ contract EsusuStorage {
         //  Increase TotalMembers count by 1
 
         EsusuCycleMapping[esusuCycleId].TotalMembers +=1;
+       
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[EsusuCycleId - 1];
+        esusuCycle.TotalMembers = EsusuCycleMapping[esusuCycleId].TotalMembers;
     }    
     function CreateMemberPositionMapping(uint256 esusuCycleId, address member) isCycleIdValid(esusuCycleId) onlyOwnerAdapterAndAdapterDelegateContract external{
         

@@ -31,6 +31,9 @@
 
 
     const EsusuStorageContract = artifacts.require('EsusuStorage');
+    const EsusuServiceContract = artifacts.require('EsusuService');
+    const GroupsContract = artifacts.require('Groups');
+    const EsusuAdapterContract = artifacts.require('EsusuAdapter');
 
     var account1;
     var account2;
@@ -49,11 +52,27 @@
     contract('EsusuStorage', ()=>{
 
         let esusuStorageContract = null;
+        let esusuServiceContract = null;
+        let esusuAdapterContract = null;
 
+        
         before(async () =>{
             esusuStorageContract = await EsusuStorageContract.deployed();
+            esusuServiceContract = await EsusuServiceContract.deployed();
+            groupsContract = await GroupsContract.deployed();
+            esusuAdapterContract = await EsusuAdapterContract.deployed();
 
-                        //  Get the addresses and Balances of at least 2 accounts to be used in the test
+
+            
+            //4. Update the EsusuAdapter Address in the EsusuService Contract
+            await esusuServiceContract.UpdateAdapter(esusuAdapterContract.address);
+            console.log("4->EsusuAdapter Address Updated In EsusuService ...");
+
+            //5. Activate the storage oracle in Groups.sol with the Address of the EsusuApter
+            await  groupsContract.activateStorageOracle(esusuAdapterContract.address);
+            console.log("5->EsusuAdapter Address Updated In Groups contract ...");
+
+            //  Get the addresses and Balances of at least 2 accounts to be used in the test
             //  Send DAI to the addresses
             web3.eth.getAccounts().then(function(accounts){
 
@@ -64,6 +83,8 @@
             });
         });
 
+        var groupName = "Invariant Nature";
+        var groupSymbol = "Alpha";
         var groupId = "1";
         var depositAmount = "2000000000000000000000";   //2,000 DAI 10000000000000000000000
         var payoutIntervalSeconds = "30";  // 2 minutes
@@ -71,29 +92,66 @@
         var maxMembers = "2";
         var currentEsusuCycleId = null;
 
+        // //1 & 2.  Create Group and Get Group Information By name
+
+        // it('EsusuService Contract: Should Create Group and Get the Group By Name', async () => {
+
+        //     await esusuServiceContract.CreateGroup(groupName, groupSymbol);
+
+        //     var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
+
+        //     console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+
+        //     groupId = BigInt(groupInfo[0]);
+        //     assert(groupInfo[1] === groupName);
+        //     assert(groupInfo[2] === groupSymbol);
+
+        // });
+
+        // //3  & 6.Create An Esusu Cycle, Get Current ID and Get the Esusu Cycle Information
+        // it('EsusuService Contract: Should Create Esusu Cycle and Get The Current Esusu Cycle', async () => {
+
+        //     //  Create esusu cycle
+        //     await esusuServiceContract.CreateEsusu(groupId.toString(),depositAmount, payoutIntervalSeconds,startTimeInSeconds.toString(),maxMembers);
+        //     //  get current cycle ID
+        //     currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
+
+        //     console.log(`Current Esusu Cycle ID: ${currentEsusuCycleId}`);
+
+        //     //  Get esusu cycle information
+        //     var result = await esusuServiceContract.GetEsusuCycle(currentEsusuCycleId.toString());
+
+        //     assert(currentEsusuCycleId.toString() === BigInt(result[0]).toString());
+
+        //     console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
+        //     CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
+        //     TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
+        //     TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+        // });
+        
         it('Esusu Storage: Should Get The Current Esusu Cycle ID',async () => {
 
             var result = await esusuStorageContract.GetEsusuCycleId();
 
-            assert(BigInt(result).toString() === "0");
+            assert(Number(BigInt(result)) > 0);
 
             console.log(`Esusu Storage: Current Cycle ID ${BigInt(result).toString()}`);
 
         });
 
-        it('Esusu Storage: Should Increase The Esusu Cycle ID By 1',async () => {
+        // it('Esusu Storage: Should Increase The Esusu Cycle ID By 1',async () => {
 
-            await esusuStorageContract.IncrementEsusuCycleId();
+        //     await esusuStorageContract.IncrementEsusuCycleId();
 
-            var result = await esusuStorageContract.GetEsusuCycleId();
+        //     var result = await esusuStorageContract.GetEsusuCycleId();
 
-            currentEsusuCycleId = BigInt(result);
+        //     currentEsusuCycleId = BigInt(result);
 
-            assert(BigInt(result).toString() === "1");
+        //     assert(BigInt(result).toString() === "1");
 
-            console.log(`Esusu Storage: Current Cycle ID ${BigInt(result).toString()}`);
+        //     console.log(`Esusu Storage: Current Cycle ID ${BigInt(result).toString()}`);
 
-        });
+        // });
 
         it('Esusu Storage: Should Create Esusu Cycle Mapping ',async () => {
 
