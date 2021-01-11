@@ -1,389 +1,463 @@
-
-pragma solidity ^0.6.6;
+pragma solidity 0.6.2;
+pragma experimental ABIEncoderV2;
 
 import "./SafeMath.sol";
 
-
 contract EsusuStorage {
-    
+
     using SafeMath for uint256;
 
     /*  Enum definitions */
     enum CurrencyEnum{
         Dai
     }
-    
+
     enum CycleStateEnum{
         Idle,               // Cycle has just been created and members can join in this state
         Active,             // Cycle has started and members can take their ROI
         Expired,            // Cycle Duration has elapsed and members can withdraw their capital as well as ROI
-        Inactive            // Total beneficiaries is equal to Total members, so all members have withdrawn their Capital and ROI 
+        Inactive            // Total beneficiaries is equal to Total members, so all members have withdrawn their Capital and ROI
     }
 
     /*  Struct Definitions */
     struct EsusuCycle{
-        uint CycleId;
-        uint GroupId;                   //  Group this Esusu Cycle belongs to
-        uint DepositAmount;
-        uint TotalMembers;
-        uint TotalBeneficiaries;        //  This is the total number of members that have withdrawn their ROI 
+        uint256 CycleId;
+        uint256 GroupId;                   //  Group this Esusu Cycle belongs to
+        uint256 DepositAmount;
+        uint256 TotalMembers;
+        uint256 TotalBeneficiaries;        //  This is the total number of members that have withdrawn their ROI 
+        uint256 PayoutIntervalSeconds;     //  Time each member receives overall ROI within one Esusu Cycle in seconds
+        uint256 TotalCycleDuration;        //  The total time it will take for all users to be paid which is (number of members * payout interval)
+        uint256 TotalAmountDeposited;      // Total  Dai Deposited
+        uint256 TotalCapitalWithdrawn;     // Total Capital In Dai Withdrawn
+        uint256 CycleStartTime;            //  Time, when the cycle starts has elapsed. Anyone can start cycle after this time has elapsed
+        uint256 TotalShares;               //  Total yDai Shares 
+        uint256 MaxMembers;                //  Maximum number of members that can join this esusu cycle
+        uint256 TotalSharesAtStart;        //  Total shares at the start of the cycle, will use this to estimate the number of shares that belongs to each member
         address Owner;                  //  This is the creator of the cycle who is also the creator of the group
-        uint PayoutIntervalSeconds;     //  Time each member receives overall ROI within one Esusu Cycle in seconds
-        uint TotalCycleDuration;        //  The total time it will take for all users to be paid which is (number of members * payout interval)
         CurrencyEnum Currency;          //  Currency supported in this Esusu Cycle 
         CycleStateEnum CycleState;      //  The current state of the Esusu Cycle
-        uint TotalAmountDeposited;   // Total  Dai Deposited
-        uint TotalCapitalWithdrawn;     // Total Capital In Dai Withdrawn
-        uint CycleStartTime;            //  Time which the cycle will start when it has elapsed. Anyone can start cycle after this time has elapsed
-        uint TotalShares;               //  Total yDai Shares 
-        uint MaxMembers;                //  Maximum number of members that can join this esusu cycle
-    }
-    
-    struct Member{
-        address MemberId;
-        uint TotalDeposited;
-        uint TotalPayoutReceived;
-    }
-    
-    struct MemberCycle{
-        uint CycleId;
-        address MemberId;
-        uint TotalAmountDepositedInCycle;
-        uint TotalPayoutReceivedInCycle;
-    }
-    
-        /*  Model definition starts */
-    string Dai = "Dai Stablecoin";
 
+    }
+    
+
+    struct MemberCycle{
+        uint256 CycleId;
+        address MemberId;
+        uint256 TotalAmountDepositedInCycle;
+        uint256 TotalPayoutReceivedInCycle;
+    }
+
+        /*  Model definition starts */
 
     /* Model definition ends */
-    
+
     //  Member variables
     address _owner;
 
-    string _feeRuleKey;
+    uint256 EsusuCycleId;
+    
+    mapping(uint256 => EsusuCycle) EsusuCycleMapping;
 
-    uint EsusuCycleId = 0;
-    
+    mapping(address=>mapping(uint256 =>MemberCycle)) MemberAddressToMemberCycleMapping;
 
-    mapping(uint => EsusuCycle) EsusuCycleMapping;
-    
+    mapping(uint256=>mapping(address => uint256)) CycleToMemberPositionMapping;   //  This tracks position of the  member in an Esusu Cycle
 
-    mapping(address=>mapping(uint=>MemberCycle)) MemberAddressToMemberCycleMapping;
+    mapping(uint256=>mapping(address => uint256)) CycleToBeneficiaryMapping;  // This tracks members that have received overall ROI and amount received within an Esusu Cycle
 
-    mapping(uint=>mapping(address=>uint)) CycleToMemberPositionMapping;   //  This tracks position of the  member in an Esusu Cycle
+    mapping(uint256=>mapping(address=> uint)) CycleToMemberWithdrawnCapitalMapping;    // This tracks members that have withdrawn their capital and the amount withdrawn
 
-    mapping(uint=>mapping(address=> uint)) CycleToBeneficiaryMapping;  // This tracks members that have received overall ROI and amount received within an Esusu Cycle
-    
-    mapping(uint=>mapping(address=> uint)) CycleToMemberWithdrawnCapitalMapping;    // This tracks members that have withdrawn their capital and the amount withdrawn 
-    
-    uint TotalDeposits; //  This holds all the dai amounts users have deposited in this contract
-    
-    
+    mapping(uint256=>uint256) GroupToCycleIndexMapping; //  This tracks the total number of cycles that belong to a group
+
+    mapping(uint256=>mapping(uint256=>uint256)) GroupToCycleIndexToCycleIDMapping; //  This maps the Group to the cycle index and then the cycle ID
+
+    mapping(address=>uint256) OwnerToCycleIndexMapping; //  This tracks the number of cycles by index created by an owner
+
+    mapping(address=>mapping(uint256 => uint256)) OwnerToCycleIndexToCycleIDMapping; //  This maps the owner to the cycle index and then to the cycle ID
+
+    mapping(address=>uint256) MemberToCycleIndexMapping; //  This tracks the number of cycles by index created by a member
+
+    mapping(address=>mapping(uint256=>uint256)) MemberToCycleIndexToCycleIDMapping; //  This maps the member to the cycle index and then to the cycle ID
+
+    mapping(address=>uint256) MemberToXendTokenRewardMapping;  //  This tracks the total amount of xend token rewards a member has received
+
+    uint256 TotalDeposits; //  This holds all the dai amounts users have deposited in this contract
+
+
     address  _adapterContract;
     address _adapterDelegateContract;
-    
+
+    EsusuCycle [] EsusuCycles;  //  This holds the array of all EsusuCycles
+
     constructor () public {
         _owner = msg.sender;
     }
-    
+
     function UpdateAdapterAndAdapterDelegateAddresses(address adapterContract, address adapterDelegateContract) onlyOwner external {
             _adapterContract = adapterContract;
             _adapterDelegateContract = adapterDelegateContract;
     }
-        
+
     function GetEsusuCycleId() external view returns (uint){
         return EsusuCycleId;
     }
-    
+
     function IncrementEsusuCycleId() external onlyOwnerAdapterAndAdapterDelegateContract {
         EsusuCycleId += 1;
     }
     
-    function CreateEsusuCycleMapping(uint groupId, uint depositAmount, uint payoutIntervalSeconds,uint startTimeInSeconds, address owner, uint maxMembers) external onlyOwnerAdapterAndAdapterDelegateContract {
+    function CreateEsusuCycleMapping(uint256 groupId, uint256 depositAmount, uint256 payoutIntervalSeconds,uint256 startTimeInSeconds, address owner, uint256 maxMembers) external onlyOwnerAdapterAndAdapterDelegateContract {
         
         EsusuCycleId += 1;
+        EsusuCycle storage cycle = EsusuCycleMapping[EsusuCycleId];
 
-        EsusuCycleMapping[EsusuCycleId].CycleId = EsusuCycleId;
-        EsusuCycleMapping[EsusuCycleId].DepositAmount = depositAmount;
-        EsusuCycleMapping[EsusuCycleId].PayoutIntervalSeconds = payoutIntervalSeconds;
-        EsusuCycleMapping[EsusuCycleId].Currency = CurrencyEnum.Dai;
-        EsusuCycleMapping[EsusuCycleId].CycleState = CycleStateEnum.Idle; 
-        EsusuCycleMapping[EsusuCycleId].Owner = owner;
-        EsusuCycleMapping[EsusuCycleId].MaxMembers = maxMembers;
-        
-        
-        //  Set the Cycle start time 
-        EsusuCycleMapping[EsusuCycleId].CycleStartTime = startTimeInSeconds;
+        cycle.CycleId = EsusuCycleId;
+        cycle.DepositAmount = depositAmount;
+        cycle.PayoutIntervalSeconds = payoutIntervalSeconds;
+        cycle.Currency = CurrencyEnum.Dai;
+        cycle.CycleState = CycleStateEnum.Idle;
+        cycle.Owner = owner;
+        cycle.MaxMembers = maxMembers;
+
+
+        //  Set the Cycle start time
+        cycle.CycleStartTime = startTimeInSeconds;
 
          //  Assign groupId
-        EsusuCycleMapping[EsusuCycleId].GroupId = groupId;
+        cycle.GroupId = groupId;
+        GroupToCycleIndexMapping[groupId] = GroupToCycleIndexMapping[groupId].add(1); //  Increase the cycle index in the group by 1
+
+        uint256 cycleIndex = GroupToCycleIndexMapping[groupId];
+        mapping(uint256=>uint256) storage cylceIndexToCycleId = GroupToCycleIndexToCycleIDMapping[groupId];
+        cylceIndexToCycleId[cycleIndex] = EsusuCycleId;
+
+        // Increase the number of cycles created by the owner
+        OwnerToCycleIndexMapping[owner] = OwnerToCycleIndexMapping[owner].add(1);
+
+        uint256 ownerCreatedCycleIndex = OwnerToCycleIndexMapping[owner];
+        mapping(uint256=>uint256) storage ownerCreatedCylceIndexToCycleId = OwnerToCycleIndexToCycleIDMapping[owner];
+        ownerCreatedCylceIndexToCycleId[ownerCreatedCycleIndex] = EsusuCycleId;
+
+        //  Push created cycle into array
+        EsusuCycles.push(cycle);
     }
-    
-    function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, 
-                                                            uint PayoutIntervalSeconds, uint CycleState, 
-                                                            uint TotalMembers, uint TotalAmountDeposited, uint TotalShares, 
+
+    function GetEsusuCycle(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount,
+                                                            uint PayoutIntervalSeconds, uint CycleState,
+                                                            uint TotalMembers, uint TotalAmountDeposited, uint TotalShares,
                                                             uint TotalCycleDurationInSeconds, uint TotalCapitalWithdrawn, uint CycleStartTimeInSeconds,
                                                             uint TotalBeneficiaries, uint MaxMembers){
-        
+
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
+
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.CycleId, cycle.DepositAmount,  cycle.PayoutIntervalSeconds, 
+
+        return (cycle.CycleId, cycle.DepositAmount,  cycle.PayoutIntervalSeconds,
                 uint256(cycle.CycleState),
                 cycle.TotalMembers, cycle.TotalAmountDeposited, cycle.TotalShares,
                 cycle.TotalCycleDuration, cycle.TotalCapitalWithdrawn, cycle.CycleStartTime,
-                cycle.TotalBeneficiaries, cycle.MaxMembers);
-        
+                cycle.TotalBeneficiaries, cycle.MaxMembers);        
     }
-    
-    
-    function GetEsusuCycleBasicInformation(uint esusuCycleId) external view returns(uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
+
+
+
+    function GetCycleIndexFromGroupId(uint groupId) external view returns(uint){
+
+        return GroupToCycleIndexMapping[groupId];
+    }
+
+    function GetCycleIdFromCycleIndexAndGroupId(uint groupId, uint cycleIndex) external view returns(uint){
+
+      mapping(uint=>uint) storage cylceIndexToCycleId = GroupToCycleIndexToCycleIDMapping[groupId];
+
+      return cylceIndexToCycleId[cycleIndex];
+    }
+
+    function GetCycleIndexFromCycleCreator(address cycleCreator) external view returns(uint){
+
+        return OwnerToCycleIndexMapping[cycleCreator];
+    }
+
+    function GetCycleIdFromCycleIndexAndCycleCreator(uint cycleIndex, address cycleCreator) external view returns(uint){
+
+      mapping(uint=>uint) storage ownerCreatedCylceIndexToCycleId = OwnerToCycleIndexToCycleIDMapping[cycleCreator];
+
+      return ownerCreatedCylceIndexToCycleId[cycleIndex];
+    }
+
+    function GetCycleIndexFromCycleMember(address member) external view returns(uint){
+
+        return MemberToCycleIndexMapping[member];
+    }
+
+    function GetCycleIdFromCycleIndexAndCycleMember(uint cycleIndex, address member) external view returns(uint){
+
+      mapping(uint=>uint) storage memberCreatedCylceIndexToCycleId = MemberToCycleIndexToCycleIDMapping[member];
+
+      return memberCreatedCylceIndexToCycleId[cycleIndex];
+    }
+
+
+
+    function GetEsusuCycleBasicInformation(uint esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint CycleId, uint DepositAmount, uint CycleState,uint TotalMembers,uint MaxMembers, uint PayoutIntervalSeconds, uint GroupId){
+
         EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.CycleId, cycle.DepositAmount, 
+
+        return (cycle.CycleId, cycle.DepositAmount,
                 uint256(cycle.CycleState),
-                cycle.TotalMembers, cycle.MaxMembers);
+                cycle.TotalMembers, cycle.MaxMembers, cycle.PayoutIntervalSeconds, cycle.GroupId);
         
     } 
     
-    function GetEsusuCycleTotalShares(uint esusuCycleId) external view returns(uint TotalShares){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.TotalShares);
+    
+    function GetEsusuCycleTotalShares(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 TotalShares){
+                        
+        return (EsusuCycleMapping[esusuCycleId].TotalShares);
     }                                                        
 
-    function GetEsusuCycleStartTime(uint esusuCycleId)external view returns(uint EsusuCycleStartTime){
-         
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.CycleStartTime);      
+    function GetEsusuCycleStartTime(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCycleStartTime){
+                         
+        return (EsusuCycleMapping[esusuCycleId].CycleStartTime);      
     }
     
     
-    function GetEsusuCyclePayoutInterval(uint esusuCycleId)external view returns(uint EsusuCyclePayoutInterval){
-         
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.PayoutIntervalSeconds);      
+    function GetEsusuCyclePayoutInterval(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCyclePayoutInterval){
+                         
+        return (EsusuCycleMapping[esusuCycleId].PayoutIntervalSeconds);      
     }
     
-    function GetEsusuCycleTotalAmountDeposited(uint esusuCycleId)external view returns(uint EsusuCycleTotalAmountDeposited){
-         
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.TotalAmountDeposited);      
+    function GetEsusuCycleTotalAmountDeposited(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCycleTotalAmountDeposited){
+                        
+        return (EsusuCycleMapping[esusuCycleId].TotalAmountDeposited);      
     }
     
-    function GetCycleOwner(uint esusuCycleId)external view returns(address EsusuCycleOwner){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.Owner);
+    function GetCycleOwner(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(address EsusuCycleOwner){
+                        
+        return (EsusuCycleMapping[esusuCycleId].Owner);
         
     }
     
-    function GetEsusuCycleDuration(uint esusuCycleId)external view returns(uint EsusuCycleDuration){
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
+    function GetEsusuCycleDuration(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCycleDuration){
         
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.TotalCycleDuration);    
+        return (EsusuCycleMapping[esusuCycleId].TotalCycleDuration);    
     }
     
-    function GetEsusuCycleTotalCapitalWithdrawn(uint esusuCycleId)external view returns(uint EsusuCycleTotalCapitalWithdrawn){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.TotalCapitalWithdrawn);       
+    function GetEsusuCycleTotalCapitalWithdrawn(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCycleTotalCapitalWithdrawn){
+                        
+        return (EsusuCycleMapping[esusuCycleId].TotalCapitalWithdrawn);       
     }
-    function GetEsusuCycleTotalBeneficiaries(uint esusuCycleId)external view returns(uint EsusuCycleTotalBeneficiaries){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
-        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
-        
-        return (cycle.TotalBeneficiaries);       
+    function GetEsusuCycleTotalBeneficiaries(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 EsusuCycleTotalBeneficiaries){
+                        
+        return (EsusuCycleMapping[esusuCycleId].TotalBeneficiaries);       
     }
-    function GetMemberWithdrawnCapitalInEsusuCycle(uint esusuCycleId,address memberAddress) external view returns (uint) {
-        
-        mapping(address=>uint) storage memberWithdrawnCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];
-        
-        uint amount = memberWithdrawnCapitalMapping[memberAddress];
-        
-        return amount;
+    function GetMemberWithdrawnCapitalInEsusuCycle(uint256 esusuCycleId,address memberAddress) external view returns (uint) {
+                        
+        return CycleToMemberWithdrawnCapitalMapping[esusuCycleId][memberAddress];
     }
     
-    function GetMemberCycleToBeneficiaryMapping(uint esusuCycleId,address memberAddress) external view returns(uint){
+    function GetMemberCycleToBeneficiaryMapping(uint256 esusuCycleId,address memberAddress) external view returns(uint){
         
-        mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[esusuCycleId];
-        
-        uint amount = beneficiaryMapping[memberAddress];
-        
-        return amount;
+        return CycleToBeneficiaryMapping[esusuCycleId][memberAddress];
     }
     
-    function IsMemberInCycle(address memberAddress,uint esusuCycleId ) external view returns(bool){
-        
-        mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[memberAddress];
-        
-        //  If member is in cycle, the cycle ID should be greater than 0
-        if(memberCycleMapping[esusuCycleId].CycleId > 0){
-            
-            return true;
-        }else{
-            return false;
-        }
+    function GetTotalMembersInCycle(uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 TotalMembers){
+                         
+        return (EsusuCycleMapping[esusuCycleId].TotalMembers);      
     }
-    
-    function IncreaseTotalAmountDepositedInCycle(uint esusuCycleId, uint amount) external onlyOwnerAdapterAndAdapterDelegateContract returns (uint){
-    
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
 
-        EsusuCycleMapping[esusuCycleId].TotalAmountDeposited =  EsusuCycleMapping[esusuCycleId].TotalAmountDeposited.add(amount);
-        
-        return EsusuCycleMapping[esusuCycleId].TotalAmountDeposited;
+    function IsMemberInCycle(address memberAddress,uint256 esusuCycleId ) external view returns(bool){
+        return MemberAddressToMemberCycleMapping[memberAddress][esusuCycleId].CycleId > 0;
     }
     
-    function CreateMemberAddressToMemberCycleMapping(address member,uint esusuCycleId ) external onlyOwnerAdapterAndAdapterDelegateContract{
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
+    function IncreaseTotalAmountDepositedInCycle(uint256 esusuCycleId, uint256 amount) isCycleIdValid(esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract returns (uint){
+    
+        EsusuCycle storage cycle = EsusuCycleMapping[EsusuCycleId];
 
+        uint256 amountDeposited = cycle.TotalAmountDeposited.add(amount);
+
+        cycle.TotalAmountDeposited =  amountDeposited;
+
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[EsusuCycleId - 1];
+        esusuCycle.TotalAmountDeposited =  amountDeposited;
+
+        
+        return amountDeposited;
+    }
+    
+    function CreateMemberAddressToMemberCycleMapping(address member,uint256 esusuCycleId ) isCycleIdValid(esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract{
+        
         //  Increment the total deposited amount for the member cycle struct
         mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[member];
         
-
         memberCycleMapping[esusuCycleId].CycleId = esusuCycleId;
         memberCycleMapping[esusuCycleId].MemberId = member;
-        memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle = memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle.add( EsusuCycleMapping[esusuCycleId].DepositAmount);
-        memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle = memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle.add(0);
-        
+        memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle = memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle.add( EsusuCycleMapping[esusuCycleId].DepositAmount);        
     }
     
-    function IncreaseTotalMembersInCycle(uint esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract{
-        
-        
+
+    
+    function GetEsusuCycleTotalSharesAtStart(uint esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint TotalSharesAtStart){
+
+
+        EsusuCycle memory cycle = EsusuCycleMapping[esusuCycleId];
+
+        return (cycle.TotalSharesAtStart);
+    }
+
+
+    function IncreaseTotalMembersInCycle(uint esusuCycleId) isCycleIdValid(esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract{
         //  Increase TotalMembers count by 1
 
         EsusuCycleMapping[esusuCycleId].TotalMembers +=1;
-    }
-    
-    function CreateMemberPositionMapping(uint esusuCycleId, address member) onlyOwnerAdapterAndAdapterDelegateContract external{
+       
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[EsusuCycleId - 1];
+        esusuCycle.TotalMembers = EsusuCycleMapping[esusuCycleId].TotalMembers;
+    }    
+    function CreateMemberPositionMapping(uint256 esusuCycleId, address member) isCycleIdValid(esusuCycleId) onlyOwnerAdapterAndAdapterDelegateContract external{
         
         mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[esusuCycleId];
-        
+
         //  Assign Position to Member In this Cycle
         memberPositionMapping[member] = EsusuCycleMapping[esusuCycleId].TotalMembers;
-    }
-    
-    function IncreaseTotalDeposits(uint esusuCycleBalance) external onlyOwnerAdapterAndAdapterDelegateContract {
+    }    
+    function IncreaseTotalDeposits(uint256 esusuCycleBalance) external onlyOwnerAdapterAndAdapterDelegateContract {
         
         TotalDeposits = TotalDeposits.add(esusuCycleBalance);
-       
+
     }
     
-    function UpdateEsusuCycleDuringStart(uint esusuCycleId,uint cycleStateEnum, uint toalCycleDuration, uint totalShares,uint currentTime) external onlyOwnerAdapterAndAdapterDelegateContract{
+    function UpdateEsusuCycleDuringStart(uint256 esusuCycleId,uint256 cycleStateEnum, uint256 toalCycleDuration, uint256 totalShares,uint256 currentTime) external onlyOwnerAdapterAndAdapterDelegateContract{
        
-        EsusuCycleMapping[esusuCycleId].TotalCycleDuration = toalCycleDuration;
-        EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum(cycleStateEnum); 
-        EsusuCycleMapping[esusuCycleId].TotalShares = totalShares;
-        EsusuCycleMapping[esusuCycleId].CycleStartTime = currentTime;
-        
+        EsusuCycle storage cycle = EsusuCycleMapping[esusuCycleId];
+
+        cycle.TotalCycleDuration = toalCycleDuration;
+        cycle.CycleState = CycleStateEnum(cycleStateEnum); 
+        cycle.TotalShares = totalShares;
+        cycle.CycleStartTime = currentTime;
+        cycle.TotalSharesAtStart = totalShares;
+
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[esusuCycleId - 1];
+        esusuCycle.TotalCycleDuration = toalCycleDuration;
+        esusuCycle.CycleState = CycleStateEnum(cycleStateEnum);
+        esusuCycle.TotalShares = totalShares;
+        esusuCycle.CycleStartTime = currentTime;
+        esusuCycle.TotalSharesAtStart = totalShares;
     }
     
-    function UpdateEsusuCycleState(uint esusuCycleId,uint cycleStateEnum) external onlyOwnerAdapterAndAdapterDelegateContract{
+    function UpdateEsusuCycleState(uint256 esusuCycleId,uint256 cycleStateEnum) external onlyOwnerAdapterAndAdapterDelegateContract{
        
         EsusuCycleMapping[esusuCycleId].CycleState = CycleStateEnum(cycleStateEnum); 
         
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[esusuCycleId - 1];
+        esusuCycle.TotalShares = EsusuCycleMapping[esusuCycleId].TotalShares;
     }
-    function GetMemberCycleInfo(address memberAddress, uint esusuCycleId) external view returns(uint CycleId, address MemberId, uint TotalAmountDepositedInCycle, uint TotalPayoutReceivedInCycle, uint memberPosition){
-        
-        require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
-        
+    function GetMemberCycleInfo(address memberAddress, uint256 esusuCycleId) isCycleIdValid(esusuCycleId) external view returns(uint256 CycleId, address MemberId, uint256 TotalAmountDepositedInCycle, uint256 TotalPayoutReceivedInCycle, uint256 memberPosition){
+                
         mapping(uint=>MemberCycle) storage memberCycleMapping =  MemberAddressToMemberCycleMapping[memberAddress];
-        
-        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[esusuCycleId];
-        
+
+        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[esusuCycleId];        
         //  Get Number(Position) of Member In this Cycle
-        uint memberPos = memberPositionMapping[memberAddress];
-        
         return  (memberCycleMapping[esusuCycleId].CycleId,memberCycleMapping[esusuCycleId].MemberId,
         memberCycleMapping[esusuCycleId].TotalAmountDepositedInCycle,
-        memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle,memberPos);
+        memberCycleMapping[esusuCycleId].TotalPayoutReceivedInCycle,memberPositionMapping[memberAddress]);
     }
     
-    function CreateMemberCapitalMapping(uint esusuCycleId, address member) external onlyOwnerAdapterAndAdapterDelegateContract {
+    function CreateMemberCapitalMapping(uint256 esusuCycleId, address member) external onlyOwnerAdapterAndAdapterDelegateContract {
          
         mapping(address=>uint) storage memberCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];
         memberCapitalMapping[member] = EsusuCycleMapping[esusuCycleId].DepositAmount;
     }
     
-    function UpdateEsusuCycleDuringCapitalWithdrawal(uint esusuCycleId, uint cycleTotalShares, uint totalCapitalWithdrawnInCycle) external onlyOwnerAdapterAndAdapterDelegateContract{
+    function UpdateEsusuCycleDuringCapitalWithdrawal(uint256 esusuCycleId, uint256 cycleTotalShares, uint256 totalCapitalWithdrawnInCycle) external onlyOwnerAdapterAndAdapterDelegateContract{
         
         EsusuCycleMapping[esusuCycleId].TotalCapitalWithdrawn = totalCapitalWithdrawnInCycle; 
         EsusuCycleMapping[esusuCycleId].TotalShares = cycleTotalShares;
+
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[esusuCycleId - 1];
+        esusuCycle.TotalCapitalWithdrawn = totalCapitalWithdrawnInCycle;
+        esusuCycle.TotalShares = cycleTotalShares;
     }
     
-    function UpdateEsusuCycleDuringROIWithdrawal(uint esusuCycleId, uint totalShares, uint totalBeneficiaries) external onlyOwnerAdapterAndAdapterDelegateContract{
+    function UpdateEsusuCycleDuringROIWithdrawal(uint256 esusuCycleId, uint256 totalShares, uint256 totalBeneficiaries) external onlyOwnerAdapterAndAdapterDelegateContract{
         EsusuCycleMapping[esusuCycleId].TotalBeneficiaries = totalBeneficiaries; 
-        EsusuCycleMapping[esusuCycleId].TotalShares = totalShares;        
+        EsusuCycleMapping[esusuCycleId].TotalShares = totalShares;  
+
+        //  Update cycle in the array
+        EsusuCycle storage esusuCycle = EsusuCycles[esusuCycleId - 1];
+        esusuCycle.TotalBeneficiaries = totalBeneficiaries;
+        esusuCycle.TotalShares = totalShares;      
     }
     
-    function CreateEsusuCycleToBeneficiaryMapping(uint esusuCycleId, address memberAddress, uint memberROINet) external onlyOwnerAdapterAndAdapterDelegateContract{
+    function CreateEsusuCycleToBeneficiaryMapping(uint256 esusuCycleId, address memberAddress, uint256 memberROINet) external onlyOwnerAdapterAndAdapterDelegateContract{
         
         mapping(address=>uint) storage beneficiaryMapping =  CycleToBeneficiaryMapping[esusuCycleId];
-        
+
         beneficiaryMapping[memberAddress] = memberROINet;
     }
-    
-    function CalculateMemberWithdrawalTime(uint cycleId, address member) external view returns(uint){
-      
-        mapping(address=>uint) storage memberPositionMapping =  CycleToMemberPositionMapping[cycleId];
-        
-        uint memberPosition = memberPositionMapping[member];
-        
-        uint withdrawalTime = (EsusuCycleMapping[cycleId].CycleStartTime.add(memberPosition.mul(EsusuCycleMapping[cycleId].PayoutIntervalSeconds)));
-        
+
+    function CalculateMemberWithdrawalTime(uint256 cycleId, address member) external view returns(uint256 withdrawalTime){
+
+        mapping(address=>uint) storage memberPositionMapping = CycleToMemberPositionMapping[cycleId];
+
+        uint256 memberPosition = memberPositionMapping[member];
+
+        withdrawalTime = (EsusuCycleMapping[cycleId].CycleStartTime.add(memberPosition.mul(EsusuCycleMapping[cycleId].PayoutIntervalSeconds)));
         return withdrawalTime;
     }
-    
-    function GetTotalDeposits() external view returns (uint){
+
+    function CreateMemberToCycleIndexToCycleIDMapping(address member, uint256 esusuCycleId) external onlyOwnerAdapterAndAdapterDelegateContract {
+      // Increase the number of cycles joined by the member
+      MemberToCycleIndexMapping[member] = MemberToCycleIndexMapping[member].add(1);
+
+      uint256 memberCreatedCycleIndex = MemberToCycleIndexMapping[member];
+      mapping(uint256=>uint256) storage memberCreatedCylceIndexToCycleId = MemberToCycleIndexToCycleIDMapping[member];
+      memberCreatedCylceIndexToCycleId[memberCreatedCycleIndex] = esusuCycleId;
+    }
+
+    function GetTotalDeposits() external view returns (uint256){
         return TotalDeposits;
     }
-    
-    function GetEsusuCycleState(uint esusuCycleId) external view returns (uint){
+
+    function GetEsusuCycleState(uint256 esusuCycleId) external view returns (uint256){
         
-        return uint(EsusuCycleMapping[esusuCycleId].CycleState);
-        
+        return uint256(EsusuCycleMapping[esusuCycleId].CycleState);
+
+    }
+
+    function UpdateMemberToXendTokeRewardMapping(address member, uint256 rewardAmount) external onlyOwnerAdapterAndAdapterDelegateContract {
+        MemberToXendTokenRewardMapping[member] = MemberToXendTokenRewardMapping[member].add(rewardAmount);
+    }
+
+    function GetMemberXendTokenReward(address member) external view returns(uint256) {
+        return MemberToXendTokenRewardMapping[member];
+    }
+
+    //  Get the EsusuCycle Array
+    function GetEsusuCycles() external view returns (EsusuCycle [] memory){
+        return EsusuCycles;
     }
     
     modifier onlyOwner() {
         require(msg.sender == _owner, "Unauthorized access to contract");
         _;
     }
-    
+
     modifier onlyOwnerAdapterAndAdapterDelegateContract() {
         require(
             msg.sender == _owner || msg.sender == _adapterDelegateContract || msg.sender == _adapterContract,
             "Unauthorized access to contract"
         );
+        _;
+    }
+
+    modifier isCycleIdValid(uint256 esusuCycleId) {
+
+        require(esusuCycleId != 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
         _;
     }
     
