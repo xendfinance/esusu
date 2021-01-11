@@ -20,9 +20,9 @@
      *  15. Calculate PercentageRewardFactor                    -   Done
      */
 
-    if(true){
-        return;
-    }
+    // if(true){
+    //     return;
+    // }
     console.log("********************** Running Reward Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');

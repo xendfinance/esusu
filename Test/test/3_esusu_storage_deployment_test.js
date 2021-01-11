@@ -92,42 +92,6 @@
         var maxMembers = "2";
         var currentEsusuCycleId = null;
 
-        // //1 & 2.  Create Group and Get Group Information By name
-
-        // it('EsusuService Contract: Should Create Group and Get the Group By Name', async () => {
-
-        //     await esusuServiceContract.CreateGroup(groupName, groupSymbol);
-
-        //     var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
-
-        //     console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
-
-        //     groupId = BigInt(groupInfo[0]);
-        //     assert(groupInfo[1] === groupName);
-        //     assert(groupInfo[2] === groupSymbol);
-
-        // });
-
-        // //3  & 6.Create An Esusu Cycle, Get Current ID and Get the Esusu Cycle Information
-        // it('EsusuService Contract: Should Create Esusu Cycle and Get The Current Esusu Cycle', async () => {
-
-        //     //  Create esusu cycle
-        //     await esusuServiceContract.CreateEsusu(groupId.toString(),depositAmount, payoutIntervalSeconds,startTimeInSeconds.toString(),maxMembers);
-        //     //  get current cycle ID
-        //     currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
-
-        //     console.log(`Current Esusu Cycle ID: ${currentEsusuCycleId}`);
-
-        //     //  Get esusu cycle information
-        //     var result = await esusuServiceContract.GetEsusuCycle(currentEsusuCycleId.toString());
-
-        //     assert(currentEsusuCycleId.toString() === BigInt(result[0]).toString());
-
-        //     console.log(`CycleId: ${BigInt(result[0])}, DepositAmount: ${BigInt(result[1])}, PayoutIntervalSeconds: ${BigInt(result[2])},
-        //     CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
-        //     TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
-        //     TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
-        // });
         
         it('Esusu Storage: Should Get The Current Esusu Cycle ID',async () => {
 
