@@ -238,7 +238,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         //  Implement our derived equation to get the amount of Dai to transfer to the member as ROI
         uint256 Bt = _esusuStorage.GetEsusuCycleTotalBeneficiaries(esusuCycleId);
 
-        uint256 Ta = totalMembers - Bt;
+        uint256 Ta = totalMembers.sub(Bt);
         uint256 Troi = overallGrossDaiBalance.sub(_esusuStorage.GetEsusuCycleTotalAmountDeposited(esusuCycleId).sub(_esusuStorage.GetEsusuCycleTotalCapitalWithdrawn(esusuCycleId)));
 
         uint Mroi = Troi.div(Ta);
