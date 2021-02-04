@@ -60,16 +60,16 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         string reason
         );
 
-        ITreasury _treasuryContract;
-        ISavingsConfig _savingsConfigContract;
-        IRewardConfig _rewardConfigContract;
-        IXendToken  _xendTokenContract;
-        string _feeRuleKey;
+        ITreasury immutable _treasuryContract;
+        ISavingsConfig immutable _savingsConfigContract;
+        IRewardConfig immutable _rewardConfigContract;
+        IXendToken  immutable _xendTokenContract;
+        string immutable _feeRuleKey;
 
-        IEsusuStorage _esusuStorage;
-        IEsusuAdapter _esusuAdapterContract;
-        IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-        IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+        IEsusuStorage immutable _esusuStorage;
+        IEsusuAdapter immutable _esusuAdapterContract;
+        IDaiToken immutable _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
+        IYDaiToken immutable _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
         uint256 _feePrecision = 10;  //  This determines the lower limit of the fee to be charged. With precsion of 10, it means our fee can have a precision of 0.1% and above
