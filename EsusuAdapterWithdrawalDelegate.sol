@@ -65,7 +65,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IRewardConfig immutable _rewardConfigContract;
         IXendToken  immutable _xendTokenContract;
         string immutable _feeRuleKey;
-
+        uint _groupCreatorRewardPercent;
         IEsusuStorage immutable _esusuStorage;
         IEsusuAdapter immutable _esusuAdapterContract;
         IDaiToken immutable _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
@@ -90,7 +90,10 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         function UpdateDaiLendingService(address daiLendingServiceContractAddress) active onlyOwner external {
             _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
         }
-
+     function setGroupCreatorRewardPercent (uint percent) external onlyOwner {
+            _groupCreatorRewardPercent = percent;
+            
+        }
         /*
             This function allows members to withdraw their capital from the esusu cycle
 
@@ -381,7 +384,9 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
          //  Add member to beneficiary mapping
 
-        _esusuStorage.CreateEsusuCycleToBeneficiaryMapping(esusuCycleId,memberAddress,memberROINet);        
+        _esusuStorage.CreateEsusuCycleToBeneficiaryMapping(esusuCycleId,memberAddress,memberROINet); 
+
+
         //  Send ROI to member 
         _dai.safeTransfer(memberAddress, memberROINet);
     
@@ -389,6 +394,13 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         //  Approve the treasury contract
         _dai.approve(address(_treasuryContract),fee);
         _treasuryContract.depositToken(address(_dai));
+
+        address cycleOwner = _esusuStorage.GetCycleOwner(esusuCycleId);
+        
+        uint creatorReward = (_groupCreatorRewardPercent.div(100)).mul(fee);
+
+        _dai.safeTransfer(cycleOwner, creatorReward);
+
 
     }
 
