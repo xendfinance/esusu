@@ -1,0 +1,239 @@
+{
+  "contractName": "IEsusuAdapter",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "TransferYDaiSharesToWithdrawalDelegate",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.6.6+commit.6c089d02\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"TransferYDaiSharesToWithdrawalDelegate\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"methods\":{}},\"userdoc\":{\"methods\":{}}},\"settings\":{\"compilationTarget\":{\"/Users/mac/Desktop/BinaryHiils/esusu/test/interfaces/IEsusuAdapter.sol\":\"IEsusuAdapter\"},\"evmVersion\":\"byzantium\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/mac/Desktop/BinaryHiils/esusu/test/interfaces/IEsusuAdapter.sol\":{\"keccak256\":\"0x716654d1656d335f350e4f767463a1d98fce9cb9ce7f3380d06946dc4cdda2c0\",\"urls\":[\"bzz-raw://f1e00935c66c68d87eb40c57b3a232743ab1eb017653f0b83e76d9df4de98c6d\",\"dweb:/ipfs/QmeamTQShfjuvMZMmeVcSETCBmHnJ4GkrdvEjWXM4FSURo\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity >=0.6.6;\n\ninterface IEsusuAdapter {\n    function TransferYDaiSharesToWithdrawalDelegate(uint amount) external;\n\n}",
+  "sourcePath": "/Users/mac/Desktop/BinaryHiils/esusu/test/interfaces/IEsusuAdapter.sol",
+  "ast": {
+    "absolutePath": "/Users/mac/Desktop/BinaryHiils/esusu/test/interfaces/IEsusuAdapter.sol",
+    "exportedSymbols": {
+      "IEsusuAdapter": [
+        11399
+      ]
+    },
+    "id": 11400,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11393,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:32"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 11399,
+        "linearizedBaseContracts": [
+          11399
+        ],
+        "name": "IEsusuAdapter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "89826132",
+            "id": 11398,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "TransferYDaiSharesToWithdrawalDelegate",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 11396,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11395,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 11398,
+                  "src": "104:11:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11394,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "104:4:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "103:13:32"
+            },
+            "returnParameters": {
+              "id": 11397,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "125:0:32"
+            },
+            "scope": 11399,
+            "src": "56:70:32",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11400,
+        "src": "26:103:32"
+      }
+    ],
+    "src": "0:129:32"
+  },
+  "legacyAST": {
+    "absolutePath": "/Users/mac/Desktop/BinaryHiils/esusu/test/interfaces/IEsusuAdapter.sol",
+    "exportedSymbols": {
+      "IEsusuAdapter": [
+        11399
+      ]
+    },
+    "id": 11400,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 11393,
+        "literals": [
+          "solidity",
+          ">=",
+          "0.6",
+          ".6"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:32"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "documentation": null,
+        "fullyImplemented": false,
+        "id": 11399,
+        "linearizedBaseContracts": [
+          11399
+        ],
+        "name": "IEsusuAdapter",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": null,
+            "documentation": null,
+            "functionSelector": "89826132",
+            "id": 11398,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "TransferYDaiSharesToWithdrawalDelegate",
+            "nodeType": "FunctionDefinition",
+            "overrides": null,
+            "parameters": {
+              "id": 11396,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11395,
+                  "mutability": "mutable",
+                  "name": "amount",
+                  "nodeType": "VariableDeclaration",
+                  "overrides": null,
+                  "scope": 11398,
+                  "src": "104:11:32",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 11394,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "104:4:32",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "103:13:32"
+            },
+            "returnParameters": {
+              "id": 11397,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "125:0:32"
+            },
+            "scope": 11399,
+            "src": "56:70:32",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 11400,
+        "src": "26:103:32"
+      }
+    ],
+    "src": "0:129:32"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.6.6+commit.6c089d02.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.3.2",
+  "updatedAt": "2021-02-03T16:37:21.510Z",
+  "devdoc": {
+    "methods": {}
+  },
+  "userdoc": {
+    "methods": {}
+  }
+}
