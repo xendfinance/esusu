@@ -64,9 +64,8 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         ISavingsConfig immutable _savingsConfigContract;
         IRewardConfig immutable _rewardConfigContract;
         IXendToken  immutable _xendTokenContract;
-        string immutable _feeRuleKey;
-        uint _groupCreatorRewardPercent;
         string _feeRuleKey;
+        uint256 _groupCreatorRewardPercent;
 
         IEsusuStorage immutable _esusuStorage;
         IEsusuAdapter immutable _esusuAdapterContract;
@@ -95,7 +94,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         }
      function setGroupCreatorRewardPercent (uint percent) external onlyOwner {
             _groupCreatorRewardPercent = percent;
-            
+     }
 
         function UpdateFeePrecision(uint256 feePrecision) onlyOwner external{
             _feePrecision = feePrecision;
