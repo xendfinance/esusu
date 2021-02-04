@@ -297,6 +297,7 @@ contract EsusuStorage {
 
         return (cycle.TotalCapitalWithdrawn);
     }
+
     function GetEsusuCycleTotalBeneficiaries(uint esusuCycleId)external view returns(uint EsusuCycleTotalBeneficiaries){
 
         require(esusuCycleId > 0 && esusuCycleId <= EsusuCycleId, "Cycle ID must be within valid EsusuCycleId range");
@@ -305,6 +306,7 @@ contract EsusuStorage {
 
         return (cycle.TotalBeneficiaries);
     }
+    
     function GetMemberWithdrawnCapitalInEsusuCycle(uint esusuCycleId,address memberAddress) external view returns (uint) {
 
         mapping(address=>uint) storage memberWithdrawnCapitalMapping =  CycleToMemberWithdrawnCapitalMapping[esusuCycleId];

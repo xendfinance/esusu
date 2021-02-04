@@ -11,10 +11,18 @@ const RewardConfigContract = artifacts.require('RewardConfig');
 const EsusuAdapterContract = artifacts.require('EsusuAdapter');
 const EsusuAdapterWithdrawalDelegateContract = artifacts.require('EsusuAdapterWithdrawalDelegate');
 const EsusuStorageContract = artifacts.require('EsusuStorage');
+const XendFinanceIndividual_Yearn_V1Contract = artifacts.require(
+  "XendFinanceIndividual_Yearn_V1"
+);
+const ClientRecordContract = artifacts.require("ClientRecord");
+
+const YDAIContractAddress = "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa";
+
+const DaiContractAddress = "0x95b58a6Bff3D14B7DB2f5cb5F0Ad413DC2940658"
 
 module.exports = function (deployer) {
 
-  console.log("********************** Running Esusu Migrations *****************************");
+  console.log("********************** Running Migrations *****************************");
 
   deployer.then(async () => {
 
@@ -37,6 +45,8 @@ module.exports = function (deployer) {
 
      await deployer.deploy(EsusuStorageContract);
 
+     await deployer.deploy(ClientRecordContract);
+
     //  address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
     //                 string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract
 
@@ -56,6 +66,18 @@ module.exports = function (deployer) {
                               XendTokenContract.address,
                               SavingsConfigContract.address);
 
+                              await deployer.deploy(
+                                XendFinanceIndividual_Yearn_V1Contract,
+                                DaiLendingServiceContract.address,
+                                DaiContractAddress,
+                                ClientRecordContract.address,
+                                SavingsConfigContract.address,
+                                YDAIContractAddress,
+                                RewardConfigContract.address,
+                                XendTokenContract.address,
+                                TreasuryContract.address
+                              );
+
      console.log("Groups Contract address: "+GroupsContract.address);
 
      console.log("Treasury Contract address: "+TreasuryContract.address);
@@ -72,11 +94,18 @@ module.exports = function (deployer) {
 
      console.log("EsusuStorage Contract address: "+EsusuStorageContract.address );
 
+     console.log("ClientRecordContract address", ClientRecordContract.address);
+
      console.log("EsusuAdapterWithdrawalDelegate Contract address: "+EsusuAdapterWithdrawalDelegateContract.address );
 
      console.log("RewardConfig Contract address: "+RewardConfigContract.address );
 
      console.log("EsusuAdapter Contract address: "+EsusuAdapterContract.address );
+
+     console.log(
+      "Xend finance individual",
+      XendFinanceIndividual_Yearn_V1Contract.address
+    );
 
      let daiLendingAdapterContract = null;
      let daiLendingServiceContract = null;
@@ -88,6 +117,8 @@ module.exports = function (deployer) {
      let esusuAdapterWithdrawalDelegateContract = null;
      let esusuStorageContract = null;
      let rewardConfigContract = null;
+     let clientRecordContract = null;
+     let individualContract = null;
 
      savingsConfigContract = await SavingsConfigContract.deployed();
      daiLendingAdapterContract = await DaiLendingAdapterContract.deployed();
@@ -99,9 +130,19 @@ module.exports = function (deployer) {
      esusuAdapterWithdrawalDelegateContract = await EsusuAdapterWithdrawalDelegateContract.deployed();
      esusuStorageContract = await EsusuStorageContract.deployed();
      rewardConfigContract = await RewardConfigContract.deployed();
+     clientRecordContract = await ClientRecordContract.deployed();
+     individualContract = await XendFinanceIndividual_Yearn_V1Contract.deployed();
 
      // 1. Create SavingsConfig rules
      await savingsConfigContract.createRule("esusufee",0,0,1000,1);
+
+       await savingsConfigContract.createRule("XEND_FINANCE_COMMISION_DIVISOR", 0, 0, 100, 1)
+
+    await savingsConfigContract.createRule("XEND_FINANCE_COMMISION_DIVIDEND", 0, 0, 1, 1)
+
+    await savingsConfigContract.createRule("PERCENTAGE_PAYOUT_TO_USERS", 0, 0, 0, 1)
+
+    await savingsConfigContract.createRule("PERCENTAGE_AS_PENALTY", 0, 0, 1, 1);
 
      console.log("1->Savings Config Rule Created ...");
 
@@ -124,6 +165,12 @@ module.exports = function (deployer) {
      //6. Xend Token Should Grant access to the  Esusu Adapter Contract
      await xendTokenContract.grantAccess(esusuAdapterContract.address);
      console.log("6->Xend Token Has Given access To Esusu Adapter to transfer tokens ...");
+
+     //6b. Xend Token should grant access to the individudal contract
+     await xendTokenContract.grantAccess(individualContract.address);
+     console.log("6b->Xend Token Has Given access To Individula contract to transfer tokens ...")
+
+     await clientRecordContract.activateStorageOracle(individualContract.address);
 
      //7. Esusu Adapter should Update Esusu Adapter Withdrawal Delegate
      await esusuAdapterContract.UpdateEsusuAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);

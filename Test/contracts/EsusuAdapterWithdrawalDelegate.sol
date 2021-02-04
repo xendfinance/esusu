@@ -65,8 +65,8 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         IEsusuStorage _esusuStorage;
         IEsusuAdapter _esusuAdapterContract;
-        IDaiToken _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
-        IYDaiToken _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
+        IDaiToken _dai = IDaiToken(0x95b58a6Bff3D14B7DB2f5cb5F0Ad413DC2940658);
+        IYDaiToken _yDai = IYDaiToken(0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa);
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
 
