@@ -66,13 +66,16 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IXendToken  immutable _xendTokenContract;
         string immutable _feeRuleKey;
         uint _groupCreatorRewardPercent;
+        string _feeRuleKey;
+
         IEsusuStorage immutable _esusuStorage;
         IEsusuAdapter immutable _esusuAdapterContract;
         IDaiToken immutable _dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
         IYDaiToken immutable _yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
         IDaiLendingService _iDaiLendingService;
         bool _isActive = true;
-
+        uint256 _feePrecision = 10;     //  This determines the lower limit of the fee to be charged. With precsion of 10, it means our fee can have a precision of 0.1% and above
+        uint256 _totalTokenReward;      //  This tracks the total number of token rewards distributed on the esusu 
 
         constructor(address payable serviceContract, address esusuStorageContract, address esusuAdapterContract,
                     string memory feeRuleKey, address treasuryContract, address rewardConfigContract, address xendTokenContract, address savingsConfigContract)public OwnableService(serviceContract){
@@ -93,6 +96,13 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
      function setGroupCreatorRewardPercent (uint percent) external onlyOwner {
             _groupCreatorRewardPercent = percent;
             
+
+        function UpdateFeePrecision(uint256 feePrecision) onlyOwner external{
+            _feePrecision = feePrecision;
+        }
+
+        function GetTotalTokenRewardDistributed() external view returns(uint256){
+            return _totalTokenReward;
         }
         /*
             This function allows members to withdraw their capital from the esusu cycle
@@ -374,9 +384,12 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         //  get feeRate from fee contract
 
         (uint256 minimum, uint256 maximum, uint256 exact, bool applies, RuleDefinition e)  = _savingsConfigContract.getRuleSet(_feeRuleKey);
-        
-        uint256 feeRate = exact;  
-        uint256 fee = Mroi.div(feeRate);
+        /**
+            fee = ( (exact/precision)/(100) * roi)
+         */
+
+        uint256 feeRate = exact; 
+        uint256 fee = Mroi.mul(feeRate).div(_feePrecision.mul(100));
         
         //  Deduct the fee
         uint256 memberROINet = Mroi.sub(fee); 
@@ -519,6 +532,9 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         //  update the xend token reward for the member
         _esusuStorage.UpdateMemberToXendTokeRewardMapping(member,reward);
+
+        //  increase the total number of xend token rewards distributed
+        _totalTokenReward = _totalTokenReward.add(reward);
 
         _emitXendTokenReward(member, reward, esusuCycleId);
     }
