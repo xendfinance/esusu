@@ -1,18 +1,18 @@
 const Web3 = require('web3');
 
-const DaiContractABI = require('./test/abi/DaiContract.json');
-const YDaiContractABI = require('./test/abi/YDaiContractABI.json');
+const DaiContractABI = require('./abi/DaiContract.json');
+const YDaiContractABI = require('./abi/YDaiContractABI.json');
 
-const DaiContractAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
+const DaiContractAddress = "0x95b58a6Bff3D14B7DB2f5cb5F0Ad413DC2940658";
 const yDaiContractAddress = "0xC2cB1040220768554cf699b0d863A3cd4324ce32";
 
-const recipientAddress = "0x1dF62f291b2E969fB0849d99D9Ce41e2F137006e";    // Unlocked recipient address
+const recipientAddress = "0x2D69A12a490d7B96eFCf84113e8730A363787508";    // Unlocked recipient address
 // const recipientAddress = "0x1dcf9AE235BbA490BA243a06197802dd9125D4aE"; // locked recipient address. NOTE: Ganache must unlock recipient address before it can receive tokens
-const unlockedAddress = "0x1eC32Bfdbdbd40C0D3ec0fe420EBCfEEb2D56917";   //  Has lots of DAI
+const unlockedAddress = "0xd386793f1db5f21609571c0164841e5ea2d33ad8";   //  Has lots of DAI
 const unlockedYDaiSenderAddress = "0x9EF7b6Db1547ae9827a036838F633808FeB9e24D";
 const yDaiRecipientAddress = "0x807A1E3FC22A9E77e97a1d4A0272DC49f8d57d61";
 
-const web3 = new Web3("HTTP://127.0.0.1:8545");
+const web3 = new Web3("https://eth-rinkeby.alchemyapi.io/v2/IC2ZFvMD2Aj5UV-1tZWtuSicwSzqOaN5/");
 const daiContract = new web3.eth.Contract(DaiContractABI, DaiContractAddress);
 const yDaiContract = new web3.eth.Contract(YDaiContractABI, yDaiContractAddress);
 
@@ -38,7 +38,7 @@ async function run() {
     if (true) {
         var amountToSend = BigInt(10000000000000000000000); //   10000 Dai
         // sendDai(amountToSend, "0x7A3068a9fec005aF90E35DA2d8c8620Ebb7a1F39");
-        sendDai(amountToSend, "0x4e07662BED487bB0426b85e466E51F3A3D9150c6");
+        sendDai(amountToSend, "0x2D69A12a490d7B96eFCf84113e8730A363787508");
 
 
     }
@@ -76,7 +76,7 @@ async function sendDai(amount, recipient) {
 
     console.log(`Sending  ${amountToSend} x 10^-18 Dai to  ${recipient}`);
 
-    await daiContract.methods.transfer(recipient, amountToSend).send({ from: unlockedYDaiSenderAddress });
+    await daiContract.methods.transfer(recipient, amountToSend).send({ from: unlockedAddress });
 
     let recipientBalance = await daiContract.methods.balanceOf(recipient).call();
 
