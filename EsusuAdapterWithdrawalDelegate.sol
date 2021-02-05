@@ -1,19 +1,19 @@
 pragma solidity 0.6.6;
 
-import "./IDaiToken.sol";
-import "./IYDaiToken.sol";
-import "./IDaiLendingService.sol";
+import "../interfaces/IDaiToken.sol";
+import "../interfaces/IYDaiToken.sol";
+import "../interfaces/IDaiLendingService.sol";
 import "./OwnableService.sol";
-import "./ITreasury.sol";
-import "./ISavingsConfig.sol";
-import "./ISavingsConfigSchema.sol";
-import "./IRewardConfig.sol";
-import "./IXendToken.sol";
+import "../interfaces/ITreasury.sol";
+import "../interfaces/ISavingsConfig.sol";
+import "../interfaces/ISavingsConfigSchema.sol";
+import "../interfaces/IRewardConfig.sol";
+import "../interfaces/IXendToken.sol";
 import "./SafeMath.sol";
-import "./IEsusuStorage.sol";
-import "./IEsusuAdapter.sol";
+import "../interfaces/IEsusuStorage.sol";
+import "../interfaces/IEsusuAdapter.sol";
 import "./SafeERC20.sol";
-import "./IERC20.sol";
+import "../interfaces/IERC20.sol";
 
 
 contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema {
@@ -401,15 +401,18 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         //  Send ROI to member 
         _dai.safeTransfer(memberAddress, memberROINet);
-    
+
+        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
+
+        uint256 finalFee = fee.sub(creatorReward);
         //  Send deducted fee to treasury
         //  Approve the treasury contract
-        _dai.approve(address(_treasuryContract),fee);
+        _dai.approve(address(_treasuryContract),finalFee);
         _treasuryContract.depositToken(address(_dai));
 
         address cycleOwner = _esusuStorage.GetCycleOwner(esusuCycleId);
         
-        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
+        
 
         _dai.safeTransfer(cycleOwner, creatorReward);
 
