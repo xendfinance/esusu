@@ -409,7 +409,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         address cycleOwner = _esusuStorage.GetCycleOwner(esusuCycleId);
         
-        uint creatorReward = (_groupCreatorRewardPercent.div(100)).mul(fee);
+        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
 
         _dai.safeTransfer(cycleOwner, creatorReward);
 
