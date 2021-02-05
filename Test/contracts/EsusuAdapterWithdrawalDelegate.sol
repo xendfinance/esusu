@@ -401,15 +401,18 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
         //  Send ROI to member 
         _dai.safeTransfer(memberAddress, memberROINet);
-    
+
+        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
+
+        uint256 finalFee = fee.sub(creatorReward);
         //  Send deducted fee to treasury
         //  Approve the treasury contract
-        _dai.approve(address(_treasuryContract),fee);
+        _dai.approve(address(_treasuryContract),finalFee);
         _treasuryContract.depositToken(address(_dai));
 
         address cycleOwner = _esusuStorage.GetCycleOwner(esusuCycleId);
         
-        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
+        
 
         _dai.safeTransfer(cycleOwner, creatorReward);
 
