@@ -16,9 +16,9 @@ const XendFinanceIndividual_Yearn_V1Contract = artifacts.require(
 );
 const ClientRecordContract = artifacts.require("ClientRecord");
 
-const YDAIContractAddress = "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa";
+const YDAIContractAddress = "0xC2cB1040220768554cf699b0d863A3cd4324ce32";
 
-const DaiContractAddress = "0x95b58a6Bff3D14B7DB2f5cb5F0Ad413DC2940658"
+const DaiContractAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F"
 
 module.exports = function (deployer) {
 
