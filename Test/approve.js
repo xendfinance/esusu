@@ -12,7 +12,16 @@ const unlockedAddress = "0xd386793f1db5f21609571c0164841e5ea2d33ad8";   //  Has 
 const unlockedYDaiSenderAddress = "0x9EF7b6Db1547ae9827a036838F633808FeB9e24D";
 const yDaiRecipientAddress = "0x807A1E3FC22A9E77e97a1d4A0272DC49f8d57d61";
 
-const web3 = new Web3("https://eth-rinkeby.alchemyapi.io/v2/IC2ZFvMD2Aj5UV-1tZWtuSicwSzqOaN5/");
+// const HDWalletProvider = require('@truffle/hdwallet-provider');
+
+// const mnemonic = "tiny film armed melody dose erosion cradle moon ivory slice stand clerk"
+
+// const provider = new HDWalletProvider(mnemonic, 'https://eth-rinkeby.alchemyapi.io/v2/IC2ZFvMD2Aj5UV-1tZWtuSicwSzqOaN5')
+
+// const web3 = new Web3(provider);
+
+const web3 = new Web3("HTTP://127.0.0.1:8545");
+
 const daiContract = new web3.eth.Contract(DaiContractABI, DaiContractAddress);
 const yDaiContract = new web3.eth.Contract(YDaiContractABI, yDaiContractAddress);
 
@@ -32,7 +41,7 @@ async function run() {
     await daiBalance();
 
     //  YDai Balance operations
-    await yDaiBalance();
+    //await yDaiBalance();
 
     //  Dai Transfer Operation
     if (true) {
@@ -44,19 +53,14 @@ async function run() {
     }
 
     //  Approve a contract-address or normal address to spend amount in dai
-    if (true) {
+    if (false) {
         var approvedAmountToSpend = BigInt(5000000000000000000); //   100000 Dai
         //approve("0xF6B58F437C5E40a0817dB3c5570e06380b4f860B", "0xFf3BC1b5be0a717b02eb24DCd1DC8E9Eefe910B1", approvedAmountToSpend);
         approve("0x0F17DE5eaFc13BDe723e06Ad884936E40ee37f16", "0x4e07662BED487bB0426b85e466E51F3A3D9150c6", approvedAmountToSpend);
 
     }
 
-    //  Approve a contract-address or normal address to spend amount in YDai
-    if (false) {
-        var approvedAmountToSpend = BigInt(100000000000000000000000); //   100000 YDai
-        approveYDai("0x0F17DE5eaFc13BDe723e06Ad884936E40ee37f16", "0x4e07662BED487bB0426b85e466E51F3A3D9150c6", approvedAmountToSpend);
-
-    }
+   
 
 
 
@@ -94,13 +98,13 @@ async function daiBalance() {
     console.log(`Recipient Adress Balance: ${recipientBalance}`);
 };
 
-async function yDaiBalance() {
-    let unlockedYDaiSenderBalance = await yDaiContract.methods.balanceOf(unlockedYDaiSenderAddress).call();
-    let unlockedYDaiRecipientBalance = await yDaiContract.methods.balanceOf(yDaiRecipientAddress).call();
+// async function yDaiBalance() {
+//     let unlockedYDaiSenderBalance = await yDaiContract.methods.balanceOf(unlockedYDaiSenderAddress).call();
+//     let unlockedYDaiRecipientBalance = await yDaiContract.methods.balanceOf(yDaiRecipientAddress).call();
 
-    console.log("Unlocked YDai Sender Address Balance: " + unlockedYDaiSenderBalance);
-    console.log("Unlocked YDai Recipient Address Balance: " + unlockedYDaiRecipientBalance);
-};
+//     console.log("Unlocked YDai Sender Address Balance: " + unlockedYDaiSenderBalance);
+//     console.log("Unlocked YDai Recipient Address Balance: " + unlockedYDaiRecipientBalance);
+// };
 
 //  Approve a smart contract address or normal address to spend on behalf of the owner
 async function approve(spender, owner, amount) {
