@@ -1,7 +1,7 @@
-pragma solidity >=0.6.6;
+pragma solidity 0.6.6;
 
 
-import "../interfaces/IERC20.sol";
+import "./IERC20.sol";
 import "./SafeMath.sol";
 import "./Address.sol";
 

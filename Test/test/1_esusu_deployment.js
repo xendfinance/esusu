@@ -20,13 +20,14 @@
      *  16. Test contract deprication               -   Done
      */
 
-    if(true){
-        return;
-    }
+    // if(true){
+    //     return;
+    // }
     console.log("********************** Running Esusu Test *****************************");
     const Web3 = require('web3');
     const { assert } = require('console');
     const web3 = new Web3("HTTP://127.0.0.1:8545");
+    const utils = require("./helpers/Utils")
 
     const DaiLendingAdapterContract = artifacts.require("DaiLendingAdapter");
     const DaiLendingServiceContract = artifacts.require("DaiLendingService");
@@ -50,7 +51,7 @@
     const DaiContractAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
     const yDaiContractAddress = "0xC2cB1040220768554cf699b0d863A3cd4324ce32"
     const unlockedAddress = "0xdcd024536877075bfb2ffb1db9655ae331045b4e";   //  Has lots of DAI
-
+    
     const daiContract = new web3.eth.Contract(DaiContractABI,DaiContractAddress);
     const yDaiContract = new web3.eth.Contract(YDaiContractABI,yDaiContractAddress);
 
@@ -167,6 +168,7 @@
             console.log("11->Xend Token Has Given access To Esusu Adapter Withdrawal Delegate to transfer tokens ...");
 
 
+
             //  Get the addresses and Balances of at least 2 accounts to be used in the test
             //  Send DAI to the addresses
             web3.eth.getAccounts().then(function(accounts){
@@ -272,8 +274,8 @@
             approveDai(esusuAdapterContract.address,account2,approvedAmountToSpend);
 
             //  Account 1 and 2 should Join esusu cycle
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account1);
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account2);
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account1});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account2});
 
             //  get current cycle ID
             currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
@@ -339,6 +341,11 @@
             CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+
+            console.log("List of All Esusu Cycles After Start");
+            console.log(EsusuCycleArray);
 
         });
 
@@ -479,6 +486,12 @@
             CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+
+            console.log("List of All Esusu Cycles After Capital Withdrawal");
+            console.log(EsusuCycleArray)
+
         });
 
 
@@ -532,9 +545,9 @@
             approveDai(esusuAdapterContract.address,account3,approvedAmountToSpend);
 
             //  Account 1, 2 & 3 should Join esusu cycle
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account1, {from: account1});
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account2, {from: account2});
-            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), account3, {from: account3});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account1});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account2});
+            await esusuServiceContract.JoinEsusu(currentEsusuCycleId.toString(), {from: account3});
 
             //  get current cycle ID
             currentEsusuCycleId = BigInt(await esusuServiceContract.GetCurrentEsusuCycleId());
@@ -771,6 +784,19 @@
 
         });
 
+
+
+        it('EsusuStorage Contract: Should Get the EsusuCycles as list of structs After Updates Have Been Made On Cycles', async () => {
+
+            var EsusuCycleArray = await esusuStorageContract.GetEsusuCycles();
+      
+            var result = EsusuCycleArray[0];
+            
+            console.log(EsusuCycleArray);
+            console.log(result);
+      
+        });
+
         //  Should depricate contract
         it('EsusuAdapter Contract: Should Depricate Contract', async () => {
 
@@ -786,11 +812,17 @@
 
 
             //  The code below should fail
+            
+            // var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
 
-            var groupInfo = await esusuServiceContract.GetGroupInformationByName(groupName);
+            // console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
 
-            console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+            try {
+                await utils.shouldThrow(esusuServiceContract.GetGroupInformationByName(groupName));
 
+            } catch (error) {
+                assert(error, " Contract is depricated");
+                console.log(`Group Id: ${BigInt(groupInfo[0])}, Name: ${groupInfo[1]}, Symbol: ${groupInfo[2]}, Owner: ${groupInfo[3]}`);
+            }
         });
-
     });

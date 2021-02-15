@@ -31,17 +31,15 @@ contract OwnableService {
     }
 
     function transferOwnership(address payable newOwner) public onlyOwner {
-        if (newOwner != address(0)) {
-            owner = newOwner;
-        }
+        require(newOwner != address(0), "address cannot be zero");
+        owner = newOwner;
     }
 
     function transferContractOwnership(address payable newServiceContract)
         public
         onlyOwnerAndServiceContract
     {
-        if (newServiceContract != address(0)) {
-            serviceContract = newServiceContract;
-        }
+        require(newServiceContract != address(0), "address cannot be zero");
+        serviceContract = newServiceContract;
     }
 }

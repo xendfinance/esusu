@@ -26,6 +26,7 @@ interface IEsusuStorage {
     function CalculateMemberWithdrawalTime(uint cycleId, address member) external view returns(uint);
     function GetTotalDeposits() external view returns (uint);
     function GetEsusuCycleState(uint esusuCycleId) external view returns (uint);
+    function GetTotalMembersInCycle(uint esusuCycleId)external view returns(uint TotalMembers); 
     function GetEsusuCycleTotalSharesAtStart(uint esusuCycleId) external view returns(uint TotalSharesAtStart);
     function GetCycleIndexFromGroupId(uint groupId) external view returns(uint);
     function GetCycleIdFromCycleIndexAndGroupId(uint groupId, uint cycleIndex) external view returns(uint);
@@ -51,6 +52,7 @@ interface IEsusuStorage {
     function UpdateEsusuCycleDuringROIWithdrawal(uint esusuCycleId, uint totalShares, uint totalBeneficiaries) external;
     function CreateEsusuCycleToBeneficiaryMapping(uint esusuCycleId, address memberAddress, uint memberROINet) external;
     function CreateMemberToCycleIndexToCycleIDMapping(address member, uint esusuCycleId) external;
+    function UpdateEsusuCycleSharesDuringJoin(uint esusuCycleId, uint memberShares) external;
     function UpdateMemberToXendTokeRewardMapping(address member, uint rewardAmount) external;
 
 }
