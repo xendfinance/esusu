@@ -1,4 +1,4 @@
-pragma solidity >=0.6.6;
+pragma solidity 0.6.6;
 
 import "../interfaces/IDaiToken.sol";
 import "../interfaces/IYDaiToken.sol";
@@ -65,6 +65,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         IRewardConfig immutable _rewardConfigContract;
         IXendToken  immutable _xendTokenContract;
         string _feeRuleKey;
+        uint256 _groupCreatorRewardPercent;
 
         IEsusuStorage immutable _esusuStorage;
         IEsusuAdapter immutable _esusuAdapterContract;
@@ -91,6 +92,9 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         function UpdateDaiLendingService(address daiLendingServiceContractAddress) active onlyOwner external {
             _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
         }
+     function setGroupCreatorRewardPercent (uint percent) external onlyOwner {
+            _groupCreatorRewardPercent = percent;
+     }
 
         function UpdateFeePrecision(uint256 feePrecision) onlyOwner external{
             _feePrecision = feePrecision;
@@ -392,14 +396,26 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
 
          //  Add member to beneficiary mapping
 
-        _esusuStorage.CreateEsusuCycleToBeneficiaryMapping(esusuCycleId,memberAddress,memberROINet);        
+        _esusuStorage.CreateEsusuCycleToBeneficiaryMapping(esusuCycleId,memberAddress,memberROINet); 
+
+
         //  Send ROI to member 
         _dai.safeTransfer(memberAddress, memberROINet);
-    
+
+        uint256 creatorReward =  fee.mul(_groupCreatorRewardPercent).div(_feePrecision.mul(100));
+
+        uint256 finalFee = fee.sub(creatorReward);
         //  Send deducted fee to treasury
         //  Approve the treasury contract
-        _dai.approve(address(_treasuryContract),fee);
+        _dai.approve(address(_treasuryContract),finalFee);
         _treasuryContract.depositToken(address(_dai));
+
+        address cycleOwner = _esusuStorage.GetCycleOwner(esusuCycleId);
+        
+        
+
+        _dai.safeTransfer(cycleOwner, creatorReward);
+
 
     }
 
