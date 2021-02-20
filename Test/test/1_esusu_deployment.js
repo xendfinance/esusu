@@ -123,7 +123,7 @@
             esusuStorageContract = await EsusuStorageContract.deployed();
 
             //1. Create SavingsConfig rules
-            await savingsConfigContract.createRule("esusufee",0,0,1000,1);
+            await savingsConfigContract.createRule("esusufee",0,0,250,1);
 
             console.log("1->Savings Config Rule Created ...");
 

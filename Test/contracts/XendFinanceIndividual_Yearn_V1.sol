@@ -270,8 +270,7 @@ contract XendFinanceIndividual_Yearn_V1 is
     }
 
     function WithdrawFromFixedDeposit(
-        uint256 recordId,
-        uint256 derivativeAmount
+        uint256 recordId
     ) external onlyNonDeprecatedCalls {
         address payable recipient = msg.sender;
 
@@ -281,6 +280,8 @@ contract XendFinanceIndividual_Yearn_V1 is
         uint256 depositDate = depositRecord.depositDateInSeconds;
 
         uint256 lockPeriod = depositRecord.lockPeriodInSeconds;
+
+        uint256 derivativeAmount = depositRecord.amount;
 
         _validateLockTimeHasElapsedAndHasNotWithdrawn(recordId);
 

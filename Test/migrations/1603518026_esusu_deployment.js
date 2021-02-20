@@ -133,9 +133,9 @@ module.exports = function (deployer) {
      individualContract = await XendFinanceIndividual_Yearn_V1Contract.deployed();
 
      // 1. Create SavingsConfig rules
-     await savingsConfigContract.createRule("esusufee",0,0,1000,1);
+     await savingsConfigContract.createRule("esusufee",0,0,250,1);
 
-       await savingsConfigContract.createRule("XEND_FINANCE_COMMISION_DIVISOR", 0, 0, 100, 1)
+       await savingsConfigContract.createRule("XEND_FINANCE_COMMISION_DIVISOR", 0, 0, 25, 1)
 
     await savingsConfigContract.createRule("XEND_FINANCE_COMMISION_DIVIDEND", 0, 0, 1, 1)
 
@@ -178,6 +178,10 @@ module.exports = function (deployer) {
      //8. Esusu Adapter Withdrawal Delegate should Update Dai Lending Service
      await esusuAdapterWithdrawalDelegateContract.UpdateDaiLendingService(daiLendingServiceContract.address);
      console.log("8->Esusu Adapter Withdrawal Delegate Has Updated Dai Lending Service ...");
+
+     await esusuAdapterWithdrawalDelegateContract.setGroupCreatorRewardPercent("10");
+     console.log("8->Esusu Adapter Withdrawal Delegate Has set the group creator reward percent ...");
+
 
      //9. Esusu Service should update esusu adapter withdrawal delegate
      await esusuServiceContract.UpdateAdapterWithdrawalDelegate(esusuAdapterWithdrawalDelegateContract.address);
