@@ -270,18 +270,18 @@ contract XendFinanceIndividual_Yearn_V1 is
     }
 
     function WithdrawFromFixedDeposit(
-        uint256 recordId
+        uint256 recordId, uint256 amount, uint256 depositDateInSeconds, uint256 lockPeriodInSeconds
     ) external onlyNonDeprecatedCalls {
         address payable recipient = msg.sender;
 
         FixedDepositRecord memory depositRecord =
             _getFixedDepositRecordById(recordId);
 
-        uint256 depositDate = depositRecord.depositDateInSeconds;
+        uint256 depositDate = depositDateInSeconds;
 
-        uint256 lockPeriod = depositRecord.lockPeriodInSeconds;
+        uint256 lockPeriod = lockPeriodInSeconds;
 
-        uint256 derivativeAmount = depositRecord.amount;
+        uint256 derivativeAmount = amount;
 
         _validateLockTimeHasElapsedAndHasNotWithdrawn(recordId);
 
