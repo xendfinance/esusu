@@ -49,7 +49,7 @@
     const YDaiContractABI = require("../abi/YDAIContractABI.json");
 
     const DaiContractAddress = "0x6B175474E89094C44Da98b954EedeAC495271d0F";
-    const yDaiContractAddress = "0xC2cB1040220768554cf699b0d863A3cd4324ce32"
+    const yDaiContractAddress = "0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01"
     const unlockedAddress = "0xdcd024536877075bfb2ffb1db9655ae331045b4e";   //  Has lots of DAI
     
     const daiContract = new web3.eth.Contract(DaiContractABI,DaiContractAddress);
@@ -398,7 +398,7 @@
             await timeout(withdrawalWaitTimeInSeconds);
 
             //  Withdraw overall ROI
-            await esusuServiceContract.WithdrawROIFromEsusuCycle(currentEsusuCycleId.toString());
+            await esusuServiceContract.WithdrawROIFromEsusuCycle(currentEsusuCycleId.toString(),{from: account1});
 
             console.log(`YDAI Balance of Esusu Adapter Withdrawal Delegate: ${await yDaiContract.methods.balanceOf(esusuAdapterWithdrawalDelegateContract.address).call()}`);
             console.log(`DAI Balance of Esusu Adapter Withdrawal Delegate: ${await daiContract.methods.balanceOf(esusuAdapterWithdrawalDelegateContract.address).call()}`);
@@ -426,6 +426,10 @@
             CycleState: ${BigInt(result[3])}, TotalMembers: ${BigInt(result[4])}, TotalAmountDeposited: ${BigInt(result[5])},TotalShares: ${BigInt(result[6])},
             TotalCycleDurationInSeconds: ${BigInt(result[7])}, TotalCapitalWithdrawn: ${BigInt(result[8])}, CycleStartTimeInSeconds: ${BigInt(result[9])},
             TotalBeneficiaries: ${BigInt(result[10])}, MaxMembers: ${BigInt(result[11])}`);
+
+            var amount =  await esusuStorageContract.GetMemberCycleToBeneficiaryMapping(currentEsusuCycleId.toString(), account1);
+            console.log(`Member has withdrawn ROI : ${amount} DAI`);
+
         });
 
         // Withdraw Capital From Esusu Cycle
