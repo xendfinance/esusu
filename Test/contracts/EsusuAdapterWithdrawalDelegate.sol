@@ -92,7 +92,7 @@ contract EsusuAdapterWithdrawalDelegate is OwnableService, ISavingsConfigSchema 
         function UpdateDaiLendingService(address daiLendingServiceContractAddress) active onlyOwner external {
             _iDaiLendingService = IDaiLendingService(daiLendingServiceContractAddress);
         }
-     function setGroupCreatorRewardPercent (uint percent) external onlyOwner {
+     function setGroupCreatorRewardPercent (uint256 percent) external onlyOwner {
             _groupCreatorRewardPercent = percent;
      }
 
