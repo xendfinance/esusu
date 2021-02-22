@@ -169,6 +169,9 @@ module.exports = function (deployer) {
      await xendTokenContract.grantAccess(individualContract.address);
      console.log("6b->Xend Token Has Given access To Individula contract to transfer tokens ...")
 
+     await individualContract.setMinimumLockPeriod("60");
+     console.log("6c -> Individual contract has set minimum lock period to be 60 seconds")
+
      await clientRecordContract.activateStorageOracle(individualContract.address);
 
      //7. Esusu Adapter should Update Esusu Adapter Withdrawal Delegate
