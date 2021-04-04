@@ -77,7 +77,7 @@ contract DaiLendingAdapter is OwnableService{
 
     IDaiToken dai = IDaiToken(0x6B175474E89094C44Da98b954EedeAC495271d0F);
 
-    IYDaiToken yDai = IYDaiToken(0xC2cB1040220768554cf699b0d863A3cd4324ce32);
+    IYDaiToken yDai = IYDaiToken(0x16de59092dAE5CcF4A1E6439D611fd0653f0Bd01);
 
     mapping(address => uint256) userDaiDeposits;
 
@@ -185,8 +185,8 @@ contract DaiLendingAdapter is OwnableService{
         uint256 amount,
         address owner,
         uint256 sharesAmount
-    ) public 
-    onlyOwnerAndServiceContract 
+    ) public
+    onlyOwnerAndServiceContract
     {
         //  To withdraw our DAI amount, the amount argument is in DAI but the withdraw function of the yDAI expects amount in yDAI token
 

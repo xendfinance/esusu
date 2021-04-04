@@ -1,5 +1,4 @@
-// SPDX-License-Identifier: MIT
-pragma solidity >=0.6.6;
+pragma solidity ^0.6.0;
 
 import "../interfaces/IGroupSchema.sol";
 import "./StorageOwners.sol";
@@ -180,7 +179,6 @@ contract Groups is IGroupSchema, StorageOwners {
 
     function _doesGroupExist(uint256 groupId) internal view returns (bool) {
         bool groupExist = GroupIndexer[groupId].exists;
-
         return groupExist;
     }
 
@@ -341,7 +339,6 @@ contract Groups is IGroupSchema, StorageOwners {
     function getGroupById(uint256 groupId)
         external
         view
-        onlyStorageOracle
         returns (
             uint256,
             string memory,
@@ -358,7 +355,6 @@ contract Groups is IGroupSchema, StorageOwners {
     function getGroupByIndex(uint256 index)
         external
         view
-        onlyStorageOracle
         returns (
             uint256,
             string memory,
@@ -369,10 +365,14 @@ contract Groups is IGroupSchema, StorageOwners {
         return _getGroupByIndex(index);
     }
 
+    function getGroupsLength() external view returns (uint256 length) {
+        length = Groups.length;
+        return length;
+    }
+
     function _getGroupByIndex(uint256 index)
         internal
         view
-        onlyStorageOracle
         returns (
             uint256,
             string memory,
@@ -386,21 +386,11 @@ contract Groups is IGroupSchema, StorageOwners {
         return (group.id, group.name, group.symbol, group.creatorAddress);
     }
 
-    function getGroupIndex(uint256 groupId)
-        external
-        view
-        onlyStorageOracle
-        returns (uint256)
-    {
+    function getGroupIndex(uint256 groupId) external view returns (uint256) {
         return _getGroupIndex(groupId);
     }
 
-    function _getGroupIndex(uint256 groupId)
-        internal
-        view
-        onlyStorageOracle
-        returns (uint256)
-    {
+    function _getGroupIndex(uint256 groupId) internal view returns (uint256) {
         bool doesGroupExist = GroupIndexer[groupId].exists;
         require(doesGroupExist == true, "Group not found");
         uint256 index = GroupIndexer[groupId].index;
